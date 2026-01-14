@@ -9,15 +9,15 @@ public record LocationData(
     double x,
     double y,
     double z,
-    float yaw,
-    float pitch
+    float pitch,
+    float yaw
 ) {
     public Vector3d toPosition() {
-        return new Vector3d(x, y, z);
+        return new Vector3d(x, y + 1.0, z);
     }
 
     public Vector3f toRotation() {
-        return new Vector3f(yaw, pitch, 0.0f);
+        return new Vector3f(pitch, yaw, 0.0f);
     }
 
     public static LocationData from(String worldName, Vector3d position, Vector3f rotation) {
@@ -26,8 +26,8 @@ public record LocationData(
             position.getX(),
             position.getY(),
             position.getZ(),
-            rotation.getYaw(),
-            rotation.getPitch()
+            rotation.getPitch(),
+            rotation.getYaw()
         );
     }
 }
