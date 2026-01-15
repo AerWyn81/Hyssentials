@@ -1,0 +1,22 @@
+$C = "../Common.ui";
+
+Group {
+  LayoutMode: Left;
+  Background: $C.@InputBoxBackground;
+  Padding: (Top: 6, Bottom: 6, Left: 12, Right: 12);
+  Anchor: (Bottom: 4);
+
+  Label #PermissionText {
+    Style: (
+      FontSize: 13,
+      TextColor: #96a9be,
+      VerticalAlignment: Center
+    );
+    FlexWeight: 1;
+  }
+
+  $C.@CancelTextButton #RemovePermButton {
+    Anchor: (Width: 36, Height: 24, Left: 10);
+    Text: "-";
+  }
+}

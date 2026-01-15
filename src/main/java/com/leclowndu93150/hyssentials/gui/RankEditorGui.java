@@ -20,6 +20,8 @@ import com.leclowndu93150.hyssentials.data.TpaSettings;
 import com.leclowndu93150.hyssentials.manager.RankManager;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RankEditorGui extends InteractiveCustomUIPage<RankEditorGui.EditorData> {
 
@@ -52,6 +54,13 @@ public class RankEditorGui extends InteractiveCustomUIPage<RankEditorGui.EditorD
     private int tpaWarmup;
     private int tpaTimeout;
 
+    private boolean rtpEnabled;
+    private int rtpCooldown;
+    private int rtpWarmup;
+
+    private List<String> grantedPermissions;
+    private String newPermissionInput = "";
+
     public RankEditorGui(@Nonnull PlayerRef playerRef, @Nonnull RankManager rankManager, @Nullable Rank existingRank) {
         super(playerRef, CustomPageLifetime.CanDismiss, EditorData.CODEC);
         this.rankManager = rankManager;
@@ -83,6 +92,12 @@ public class RankEditorGui extends InteractiveCustomUIPage<RankEditorGui.EditorD
             this.tpaCooldown = existingRank.getTpaSettings().getCooldownSeconds();
             this.tpaWarmup = existingRank.getTpaSettings().getWarmupSeconds();
             this.tpaTimeout = existingRank.getTpaSettings().getTimeoutSeconds();
+
+            this.rtpEnabled = existingRank.getRtpSettings().isEnabled();
+            this.rtpCooldown = existingRank.getRtpSettings().getCooldownSeconds();
+            this.rtpWarmup = existingRank.getRtpSettings().getWarmupSeconds();
+
+            this.grantedPermissions = new ArrayList<>(existingRank.getGrantedPermissions());
         } else {
             this.id = "";
             this.displayName = "";
@@ -111,6 +126,13 @@ public class RankEditorGui extends InteractiveCustomUIPage<RankEditorGui.EditorD
             this.tpaCooldown = tpaDefaults.getCooldownSeconds();
             this.tpaWarmup = tpaDefaults.getWarmupSeconds();
             this.tpaTimeout = tpaDefaults.getTimeoutSeconds();
+
+            CommandSettings rtpDefaults = CommandSettings.rtpDefaultSettings();
+            this.rtpEnabled = rtpDefaults.isEnabled();
+            this.rtpCooldown = rtpDefaults.getCooldownSeconds();
+            this.rtpWarmup = rtpDefaults.getWarmupSeconds();
+
+            this.grantedPermissions = new ArrayList<>();
         }
     }
 
@@ -147,6 +169,9 @@ public class RankEditorGui extends InteractiveCustomUIPage<RankEditorGui.EditorD
         cmd.set("#TpaWarmupField.Value", String.valueOf(tpaWarmup));
         cmd.set("#TpaTimeoutField.Value", String.valueOf(tpaTimeout));
 
+        cmd.set("#RtpEnabled #CheckBox.Value", rtpEnabled);
+        cmd.set("#RtpCooldownField.Value", String.valueOf(rtpCooldown));
+        cmd.set("#RtpWarmupField.Value", String.valueOf(rtpWarmup));
 
         events.addEventBinding(CustomUIEventBindingType.ValueChanged, "#IdField",
             EventData.of("@Id", "#IdField.Value"), false);
@@ -194,10 +219,38 @@ public class RankEditorGui extends InteractiveCustomUIPage<RankEditorGui.EditorD
         events.addEventBinding(CustomUIEventBindingType.ValueChanged, "#TpaTimeoutField",
             EventData.of("@TpaTimeout", "#TpaTimeoutField.Value"), false);
 
+        events.addEventBinding(CustomUIEventBindingType.ValueChanged, "#RtpEnabled #CheckBox",
+            EventData.of("@RtpEnabled", "#RtpEnabled #CheckBox.Value"), false);
+        events.addEventBinding(CustomUIEventBindingType.ValueChanged, "#RtpCooldownField",
+            EventData.of("@RtpCooldown", "#RtpCooldownField.Value"), false);
+        events.addEventBinding(CustomUIEventBindingType.ValueChanged, "#RtpWarmupField",
+            EventData.of("@RtpWarmup", "#RtpWarmupField.Value"), false);
+
+        events.addEventBinding(CustomUIEventBindingType.ValueChanged, "#NewPermissionField",
+            EventData.of("@NewPermission", "#NewPermissionField.Value"), false);
+        events.addEventBinding(CustomUIEventBindingType.Activating, "#AddPermissionButton",
+            EventData.of("Action", "AddPermission"), false);
+
+        buildPermissionsList(cmd, events);
+
         events.addEventBinding(CustomUIEventBindingType.Activating, "#SaveButton",
             EventData.of("Action", "Save"), false);
         events.addEventBinding(CustomUIEventBindingType.Activating, "#CancelButton",
             EventData.of("Action", "Cancel"), false);
+    }
+
+    private void buildPermissionsList(UICommandBuilder cmd, UIEventBuilder events) {
+        cmd.clear("#PermissionsList");
+
+        for (int i = 0; i < grantedPermissions.size(); i++) {
+            String permission = grantedPermissions.get(i);
+            cmd.append("#PermissionsList", "Pages/Hyssentials_PermissionEntry.ui");
+            cmd.set("#PermissionsList[" + i + "] #PermissionText.Text", permission);
+
+            events.addEventBinding(CustomUIEventBindingType.Activating,
+                "#PermissionsList[" + i + "] #RemovePermButton",
+                EventData.of("Action", "RemovePermission:" + permission), false);
+        }
     }
 
     @Override
@@ -231,7 +284,35 @@ public class RankEditorGui extends InteractiveCustomUIPage<RankEditorGui.EditorD
         if (data.tpaWarmup != null) this.tpaWarmup = parseIntSafe(data.tpaWarmup, 0);
         if (data.tpaTimeout != null) this.tpaTimeout = parseIntSafe(data.tpaTimeout, 60);
 
+        if (data.rtpEnabled != null) this.rtpEnabled = data.rtpEnabled;
+        if (data.rtpCooldown != null) this.rtpCooldown = parseIntSafe(data.rtpCooldown, 300);
+        if (data.rtpWarmup != null) this.rtpWarmup = parseIntSafe(data.rtpWarmup, 5);
+
+        if (data.newPermission != null) this.newPermissionInput = data.newPermission.trim();
+
         if (data.action != null) {
+            if (data.action.equals("AddPermission")) {
+                if (!newPermissionInput.isEmpty() && !grantedPermissions.contains(newPermissionInput)) {
+                    grantedPermissions.add(newPermissionInput);
+                    newPermissionInput = "";
+                    UICommandBuilder cmd = new UICommandBuilder();
+                    UIEventBuilder events = new UIEventBuilder();
+                    cmd.set("#NewPermissionField.Value", "");
+                    buildPermissionsList(cmd, events);
+                    this.sendUpdate(cmd, events, false);
+                }
+                return;
+            }
+
+            if (data.action.startsWith("RemovePermission:")) {
+                String permToRemove = data.action.substring(17);
+                grantedPermissions.remove(permToRemove);
+                UICommandBuilder cmd = new UICommandBuilder();
+                UIEventBuilder events = new UIEventBuilder();
+                buildPermissionsList(cmd, events);
+                this.sendUpdate(cmd, events, false);
+                return;
+            }
             if (data.action.equals("Save")) {
                 if (id.isEmpty() || displayName.isEmpty()) {
                     return;
@@ -286,6 +367,14 @@ public class RankEditorGui extends InteractiveCustomUIPage<RankEditorGui.EditorD
         tpaSettings.setTimeoutSeconds(tpaTimeout);
         rank.setTpaSettings(tpaSettings);
 
+        CommandSettings rtpSettings = new CommandSettings();
+        rtpSettings.setEnabled(rtpEnabled);
+        rtpSettings.setCooldownSeconds(rtpCooldown);
+        rtpSettings.setWarmupSeconds(rtpWarmup);
+        rank.setRtpSettings(rtpSettings);
+
+        rank.setGrantedPermissions(grantedPermissions);
+
         if (isNewRank) {
             rankManager.addRank(rank);
         } else {
@@ -329,6 +418,10 @@ public class RankEditorGui extends InteractiveCustomUIPage<RankEditorGui.EditorD
             .addField(new KeyedCodec<>("@TpaCooldown", Codec.STRING), (d, s) -> d.tpaCooldown = s, d -> d.tpaCooldown)
             .addField(new KeyedCodec<>("@TpaWarmup", Codec.STRING), (d, s) -> d.tpaWarmup = s, d -> d.tpaWarmup)
             .addField(new KeyedCodec<>("@TpaTimeout", Codec.STRING), (d, s) -> d.tpaTimeout = s, d -> d.tpaTimeout)
+            .addField(new KeyedCodec<>("@RtpEnabled", Codec.BOOLEAN), (d, b) -> d.rtpEnabled = b, d -> d.rtpEnabled)
+            .addField(new KeyedCodec<>("@RtpCooldown", Codec.STRING), (d, s) -> d.rtpCooldown = s, d -> d.rtpCooldown)
+            .addField(new KeyedCodec<>("@RtpWarmup", Codec.STRING), (d, s) -> d.rtpWarmup = s, d -> d.rtpWarmup)
+            .addField(new KeyedCodec<>("@NewPermission", Codec.STRING), (d, s) -> d.newPermission = s, d -> d.newPermission)
             .addField(new KeyedCodec<>("Action", Codec.STRING), (d, s) -> d.action = s, d -> d.action)
             .build();
 
@@ -352,6 +445,10 @@ public class RankEditorGui extends InteractiveCustomUIPage<RankEditorGui.EditorD
         private String tpaCooldown;
         private String tpaWarmup;
         private String tpaTimeout;
+        private Boolean rtpEnabled;
+        private String rtpCooldown;
+        private String rtpWarmup;
+        private String newPermission;
         private String action;
     }
 }

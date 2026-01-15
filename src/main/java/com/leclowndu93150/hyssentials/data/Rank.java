@@ -1,6 +1,8 @@
 package com.leclowndu93150.hyssentials.data;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Rank {
     public static final String PERMISSION_PREFIX = "hyssentials.rank.";
@@ -14,6 +16,8 @@ public class Rank {
     private CommandSettings spawnSettings = CommandSettings.defaultSettings();
     private CommandSettings backSettings = CommandSettings.defaultSettings();
     private TpaSettings tpaSettings = TpaSettings.defaultSettings();
+    private CommandSettings rtpSettings = CommandSettings.defaultSettings();
+    private List<String> grantedPermissions = new ArrayList<>();
 
     public Rank() {
     }
@@ -21,7 +25,7 @@ public class Rank {
     public Rank(String id, String displayName, int priority, int maxHomes,
                 CommandSettings homeSettings, CommandSettings warpSettings,
                 CommandSettings spawnSettings, CommandSettings backSettings,
-                TpaSettings tpaSettings) {
+                TpaSettings tpaSettings, CommandSettings rtpSettings, List<String> grantedPermissions) {
         this.id = id;
         this.displayName = displayName;
         this.priority = priority;
@@ -31,6 +35,8 @@ public class Rank {
         this.spawnSettings = spawnSettings;
         this.backSettings = backSettings;
         this.tpaSettings = tpaSettings;
+        this.rtpSettings = rtpSettings != null ? rtpSettings : CommandSettings.defaultSettings();
+        this.grantedPermissions = grantedPermissions != null ? new ArrayList<>(grantedPermissions) : new ArrayList<>();
     }
 
     public String getId() {
@@ -105,6 +111,33 @@ public class Rank {
         this.tpaSettings = tpaSettings;
     }
 
+    public CommandSettings getRtpSettings() {
+        return rtpSettings;
+    }
+
+    public void setRtpSettings(CommandSettings rtpSettings) {
+        this.rtpSettings = rtpSettings;
+    }
+
+    @Nonnull
+    public List<String> getGrantedPermissions() {
+        return grantedPermissions;
+    }
+
+    public void setGrantedPermissions(List<String> grantedPermissions) {
+        this.grantedPermissions = grantedPermissions != null ? new ArrayList<>(grantedPermissions) : new ArrayList<>();
+    }
+
+    public void addGrantedPermission(String permission) {
+        if (!grantedPermissions.contains(permission)) {
+            grantedPermissions.add(permission);
+        }
+    }
+
+    public void removeGrantedPermission(String permission) {
+        grantedPermissions.remove(permission);
+    }
+
     @Nonnull
     public String getPermission() {
         return PERMISSION_PREFIX + id;
@@ -121,7 +154,9 @@ public class Rank {
             CommandSettings.defaultSettings(),
             CommandSettings.defaultSettings(),
             CommandSettings.defaultSettings(),
-            TpaSettings.defaultSettings()
+            TpaSettings.defaultSettings(),
+            CommandSettings.rtpDefaultSettings(),
+            new ArrayList<>()
         );
     }
 
@@ -136,7 +171,9 @@ public class Rank {
             CommandSettings.vipSettings(),
             CommandSettings.vipSettings(),
             CommandSettings.vipSettings(),
-            TpaSettings.vipSettings()
+            TpaSettings.vipSettings(),
+            CommandSettings.rtpVipSettings(),
+            new ArrayList<>()
         );
     }
 
@@ -150,7 +187,9 @@ public class Rank {
             warpSettings.copy(),
             spawnSettings.copy(),
             backSettings.copy(),
-            tpaSettings.copy()
+            tpaSettings.copy(),
+            rtpSettings.copy(),
+            new ArrayList<>(grantedPermissions)
         );
     }
 }

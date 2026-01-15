@@ -2,6 +2,7 @@ package com.leclowndu93150.hyssentials.manager;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3f;
 import com.hypixel.hytale.server.core.Message;
@@ -163,27 +164,32 @@ public class TeleportWarmupManager {
             backManager.saveLocation(playerUuid, LocationData.from(currentWorld.getName(), currentPos, currentRot));
         }
 
-        // Get target world
         World targetWorld = Universe.get().getWorld(destination.worldName());
         if (targetWorld == null) {
             targetWorld = currentWorld;
         }
 
-        // Execute teleport
+        // Preload chunk before teleporting
         World finalWorld = targetWorld;
-        currentWorld.execute(() -> {
-            Teleport teleport = new Teleport(finalWorld, destination.toPosition(), destination.toRotation());
-            store.addComponent(ref, Teleport.getComponentType(), teleport);
+        long chunkIndex = ChunkUtil.indexChunkFromBlock((int) destination.x(), (int) destination.z());
 
-            // Set cooldown
-            cooldownManager.setCooldown(playerUuid, commandType);
+        finalWorld.getChunkStore().getChunkReferenceAsync(chunkIndex).thenAccept(chunkRef -> {
+            currentWorld.execute(() -> {
+                Teleport teleport = new Teleport(finalWorld, destination.toPosition(), destination.toRotation());
+                store.addComponent(ref, Teleport.getComponentType(), teleport);
 
-            String destName = displayName != null ? displayName : String.format("%.1f, %.1f, %.1f", destination.x(), destination.y(), destination.z());
-            playerRef.sendMessage(Message.raw(String.format("Teleported to %s!", destName)));
+                cooldownManager.setCooldown(playerUuid, commandType);
 
-            if (onComplete != null) {
-                onComplete.run();
-            }
+                String destName = displayName != null ? displayName : String.format("%.1f, %.1f, %.1f", destination.x(), destination.y(), destination.z());
+                playerRef.sendMessage(Message.raw(String.format("Teleported to %s!", destName)));
+
+                if (onComplete != null) {
+                    onComplete.run();
+                }
+            });
+        }).exceptionally(ex -> {
+            playerRef.sendMessage(Message.raw("Failed to load destination chunk. Teleport cancelled."));
+            return null;
         });
     }
 

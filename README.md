@@ -1,114 +1,113 @@
 # Hyssentials
 
-Essential server commands for Hytale.
+Essential server commands and a powerful rank system for Hytale.
 
-## Commands
+## Features
 
-### Teleport Requests
+- **Teleport Requests (TPA)** - Request to teleport to other players
+- **Homes** - Save and teleport to personal locations
+- **Warps** - Server-wide teleport points
+- **Random Teleport** - Teleport to random safe locations
+- **Spawn** - Quick teleport to server spawn
+- **Back** - Return to previous location (works after death!)
+- **Rank System** - Fully customizable ranks with in-game UI
+- **Per-Rank Settings** - Configure cooldowns, warmups, and home limits per rank
 
-*   `/tpa <player>` - Request to teleport to a player
-*   `/tpahere <player>` - Request a player to teleport to you
-*   `/tpaccept` - Accept a teleport request
-*   `/tpdeny` - Deny a teleport request
-*   `/tpcancel` - Cancel your outgoing request
+## Documentation
 
-### Homes
+**[View Full Documentation](docs/index.html)** - Comprehensive guide for players and admins
 
-*   `/sethome <name>` - Set a home
-*   `/home <name>` - Teleport to a home
-*   `/delhome <name>` - Delete a home
-*   `/homes` - List your homes
+## Quick Start
 
-### Warps
+### Player Commands
 
-*   `/setwarp <name>` - Create a server warp (admin)
-*   `/warp <name>` - Teleport to a warp
-*   `/delwarp <name>` - Delete a warp (admin)
-*   `/warps` - List all warps
+| Command | Description |
+|---------|-------------|
+| `/tpa <player>` | Request to teleport to a player |
+| `/tpahere <player>` | Request a player to teleport to you |
+| `/tpaccept` / `/tpdeny` | Accept or deny teleport requests |
+| `/sethome <name>` | Save your current location |
+| `/home <name>` | Teleport to a saved home |
+| `/homes` | List all your homes |
+| `/warp <name>` | Teleport to a server warp |
+| `/warps` | List all warps |
+| `/spawn` | Teleport to spawn |
+| `/rtp` | Random teleport (aliases: `/randomtp`, `/wild`) |
+| `/back` | Return to previous location |
 
-### Spawn
+### Admin Commands
 
-*   `/spawn` - Teleport to spawn
-*   `/setspawn` - Set custom spawn point (admin)
+| Command | Description |
+|---------|-------------|
+| `/hyssentials rank` | Open rank management UI |
+| `/hyssentials assign` | Open player rank assignment UI |
+| `/hyssentials setrank <player> <rank>` | Give a rank to a player |
+| `/hyssentials removerank <player> <rank>` | Remove a rank from a player |
+| `/hyssentials playerinfo <player>` | View player's rank info |
+| `/hyssentials reload` | Reload configuration |
+| `/setwarp <name>` | Create a server warp |
+| `/delwarp <name>` | Delete a warp |
+| `/setspawn` | Set server spawn |
+| `/htp <player>` | Teleport to a player |
+| `/htphere <player>` | Teleport a player to you |
 
-### Utilities
+*Tip: Use `/hys` as a shortcut for `/hyssentials`*
 
-*   `/back` - Return to your previous location (works after death)
-*   `/htp <player>` - Teleport to a player (admin)
-*   `/htphere <player>` - Teleport a player to you (admin)
+## Rank System
 
-## Configuration
+Hyssentials features a fully customizable rank-based configuration system with an in-game UI.
 
-Config file: `config.json`
+![Rank Management](docs/images/rank-management.png)
 
-```
-{
-  "ConfigVersion": 3,
-  "MaxHomes": 5,
-  "TpaTimeoutSeconds": 60,
-  "TpaCooldownSeconds": 30,
-  "TeleportDelaySeconds": 3,
-  "BackHistorySize": 5,
-  "HomeCooldownSeconds": 60,
-  "WarpCooldownSeconds": 60,
-  "SpawnCooldownSeconds": 60,
-  "BackCooldownSeconds": 60,
-  "VipMaxHomes": 10,
-  "VipHomeCooldownSeconds": 0,
-  "VipWarpCooldownSeconds": 0,
-  "VipSpawnCooldownSeconds": 0,
-  "VipBackCooldownSeconds": 0
-}
-```
+### Per-Rank Configuration
+- **Max Homes** - How many homes each rank can set
+- **Cooldowns** - Time between command uses (per command)
+- **Warmups** - Delay before teleport (moving cancels it)
+- **Command Access** - Enable/disable commands per rank
+- **Granted Permissions** - Additional permissions from other plugins
 
-| Option                  | Description                          | Default |
-| ----------------------- | ------------------------------------ | ------- |
-| MaxHomes                | Maximum homes per player             | 5       |
-| TpaTimeoutSeconds       | Seconds before TPA request expires   | 60      |
-| TpaCooldownSeconds      | Seconds between TPA requests         | 30      |
-| TeleportDelaySeconds    | Delay before teleport (unused)       | 3       |
-| BackHistorySize         | Number of locations to remember      | 5       |
-| HomeCooldownSeconds     | Seconds between /home uses           | 60      |
-| WarpCooldownSeconds     | Seconds between /warp uses           | 60      |
-| SpawnCooldownSeconds    | Seconds between /spawn uses          | 60      |
-| BackCooldownSeconds     | Seconds between /back uses           | 60      |
-| VipMaxHomes             | Maximum homes for VIP players        | 10      |
-| VipHomeCooldownSeconds  | /home cooldown for VIP (0=none)      | 0       |
-| VipWarpCooldownSeconds  | /warp cooldown for VIP (0=none)      | 0       |
-| VipSpawnCooldownSeconds | /spawn cooldown for VIP (0=none)     | 0       |
-| VipBackCooldownSeconds  | /back cooldown for VIP (0=none)      | 0       |
+### Default Ranks
 
-## Data Storage
+| Rank | Permission | Max Homes | Cooldowns |
+|------|------------|-----------|-----------|
+| Default | `hyssentials.rank.default` | 5 | 60 seconds |
+| VIP | `hyssentials.rank.vip` | 10 | None |
 
-All data is stored in JSON files in the plugin data folder:
+## Configuration Files
 
-*   `homes.json` - Player homes
-*   `warps.json` - Server warps
-*   `spawn.json` - Custom spawn point
+| File | Description |
+|------|-------------|
+| `config.json` | Global settings |
+| `ranks.json` | Rank definitions |
+| `homes.json` | Player home locations |
+| `warps.json` | Server warp points |
+| `spawn.json` | Custom spawn point |
 
 ## Permissions
 
 ### Admin Permissions
+- `hyssentials.admin.ranks` - Access rank management UI
+- `hyssentials.admin.setrank` - Assign/remove ranks
+- `hyssentials.admin.playerinfo` - View player info
+- `hyssentials.admin.reload` - Reload configuration
+- `hyssentials.setspawn` - Set server spawn
+- `hyssentials.setwarp` / `hyssentials.delwarp` - Manage warps
+- `hyssentials.htp` / `hyssentials.htphere` - Admin teleport
 
-Admin commands require operator status or the following permissions:
+### Special Permissions
+- `hyssentials.cooldown.bypass` - Bypass all cooldowns and warmups
 
-*   `hyssentials.setspawn` - Set server spawn
-*   `hyssentials.setwarp` - Create warps
-*   `hyssentials.delwarp` - Delete warps
-*   `hyssentials.htp` - Teleport to players
-*   `hyssentials.htphere` - Teleport players to you
+### Legacy Permissions (Backwards Compatible)
+- `hyssentials.vip` - Maps to VIP rank
+- `hyssentials.vip.homes` - Extended home limit
+- `hyssentials.vip.cooldown` - Reduced cooldowns
 
-### VIP Permissions
+## Support
 
-Grant players VIP benefits like more homes and reduced cooldowns:
+Join our [Discord](https://discord.gg/m4EHeRjfZ9) for support and updates!
 
-*   `hyssentials.vip` - Full VIP benefits (homes + cooldowns)
-*   `hyssentials.vip.homes` - Extended homes limit only
-*   `hyssentials.vip.cooldown` - Reduced cooldowns only
-*   `hyssentials.cooldown.bypass` - Completely bypass all cooldowns
+---
 
-Support on [Discord](https://discord.gg/m4EHeRjfZ9)
+If you'd like to support me and the development of my mods, I recommend trying out BisectHosting. Use code "project8gbderam" to get 25% off your first month of a gaming server for new customers. They offer 24/7 support and lightning-fast response times, ensuring you're in great hands and providing exceptional assistance for all your gaming needs.
 
-If you'd like to support me and the development of my mods, I recommend trying out BisectHosting. Use code "project8gbderam" to get 25% off your first month of a gaming server for new customers. They offer 24/7 support and lightning-fast response times, ensuring you're in great hands and providing exceptional assistance for all your gaming needs. [https://www.bisecthosting.com/project8gbderam](https://www.curseforge.com/linkout?remoteUrl=https://www.bisecthosting.com/project8gbderam)
-
-![Bisect](https://www.bisecthosting.com/partners/custom-banners/54bb107c-f9fc-4f32-8515-fb4e3d56c124.png)
+[![Bisect](https://www.bisecthosting.com/partners/custom-banners/54bb107c-f9fc-4f32-8515-fb4e3d56c124.png)](https://www.bisecthosting.com/project8gbderam)

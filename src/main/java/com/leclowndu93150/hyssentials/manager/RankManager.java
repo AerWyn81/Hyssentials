@@ -218,6 +218,7 @@ public class RankManager {
             case "warp" -> rank.getWarpSettings();
             case "spawn" -> rank.getSpawnSettings();
             case "back" -> rank.getBackSettings();
+            case "rtp" -> rank.getRtpSettings();
             default -> CommandSettings.defaultSettings();
         };
     }
@@ -235,6 +236,12 @@ public class RankManager {
             PermissionsModule.get().addUserPermission(playerUuid, Set.of(permission));
             boolean hasAfter = PermissionsModule.get().hasPermission(playerUuid, permission);
             logger.atInfo().log("[RankManager] After grant, hasPermission=%s", hasAfter);
+
+            List<String> grantedPerms = rank.getGrantedPermissions();
+            if (!grantedPerms.isEmpty()) {
+                logger.atInfo().log("[RankManager] Granting %d extra permissions from rank", grantedPerms.size());
+                PermissionsModule.get().addUserPermission(playerUuid, Set.copyOf(grantedPerms));
+            }
         } else {
             logger.atWarning().log("[RankManager] Rank not found: %s", rankId);
         }
@@ -249,6 +256,12 @@ public class RankManager {
             PermissionsModule.get().removeUserPermission(playerUuid, Set.of(permission));
             boolean hasAfter = PermissionsModule.get().hasPermission(playerUuid, permission);
             logger.atInfo().log("[RankManager] After revoke, hasPermission=%s", hasAfter);
+
+            List<String> grantedPerms = rank.getGrantedPermissions();
+            if (!grantedPerms.isEmpty()) {
+                logger.atInfo().log("[RankManager] Revoking %d extra permissions from rank", grantedPerms.size());
+                PermissionsModule.get().removeUserPermission(playerUuid, Set.copyOf(grantedPerms));
+            }
         } else {
             logger.atWarning().log("[RankManager] Rank not found: %s", rankId);
         }

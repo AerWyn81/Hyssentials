@@ -11,6 +11,7 @@ import com.leclowndu93150.hyssentials.commands.home.SetHomeCommand;
 import com.leclowndu93150.hyssentials.commands.spawn.SetSpawnCommand;
 import com.leclowndu93150.hyssentials.commands.spawn.SpawnCommand;
 import com.leclowndu93150.hyssentials.commands.teleport.BackCommand;
+import com.leclowndu93150.hyssentials.commands.teleport.RtpCommand;
 import com.leclowndu93150.hyssentials.commands.teleport.TpCommand;
 import com.leclowndu93150.hyssentials.commands.teleport.TphereCommand;
 import com.leclowndu93150.hyssentials.commands.tpa.TpacceptCommand;
@@ -92,6 +93,7 @@ public class HyssentialsPlugin extends JavaPlugin {
         this.getCommandRegistry().registerCommand(new SetSpawnCommand(this.spawnManager));
         this.getCommandRegistry().registerCommand(new SpawnCommand(this.spawnManager, this.warmupManager, this.cooldownManager, this.rankManager));
         this.getCommandRegistry().registerCommand(new BackCommand(this.backManager, this.warmupManager, this.cooldownManager, this.rankManager));
+        this.getCommandRegistry().registerCommand(new RtpCommand(this.warmupManager, this.cooldownManager, this.rankManager));
         this.getCommandRegistry().registerCommand(new TpCommand(this.backManager));
         this.getCommandRegistry().registerCommand(new TphereCommand(this.backManager));
         this.getCommandRegistry().registerCommand(new HysCommand(this.rankManager, this.homeManager, this.config));

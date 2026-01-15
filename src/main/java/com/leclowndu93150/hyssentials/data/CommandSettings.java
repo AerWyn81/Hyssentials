@@ -50,6 +50,16 @@ public class CommandSettings {
         return new CommandSettings(true, 0, 0);
     }
 
+    @Nonnull
+    public static CommandSettings rtpDefaultSettings() {
+        return new CommandSettings(true, 300, 5); // 5 min cooldown, 5 sec warmup
+    }
+
+    @Nonnull
+    public static CommandSettings rtpVipSettings() {
+        return new CommandSettings(true, 60, 0); // 1 min cooldown, no warmup
+    }
+
     public CommandSettings copy() {
         return new CommandSettings(enabled, cooldownSeconds, warmupSeconds);
     }
