@@ -1,0 +1,221 @@
+$C = "../Common.ui";
+
+@FieldLabelStyle = LabelStyle(FontSize: 12, TextColor: #96a9be, RenderBold: true, RenderUppercase: true);
+@FieldDescStyle = LabelStyle(FontSize: 11, TextColor: #6e7da1);
+@SectionLabelStyle = LabelStyle(FontSize: 14, TextColor: #93844c, RenderBold: true, RenderUppercase: true);
+
+$C.@PageOverlay {
+  $C.@Container {
+    Anchor: (Width: 650, Height: 750);
+
+    #Title {
+      Group {
+        Anchor: (Height: 50);
+
+        Label #TitleLabel {
+          Style: (
+            FontSize: 24,
+            LetterSpacing: 2,
+            RenderUppercase: true,
+            RenderBold: true,
+            TextColor: #ccb588,
+            HorizontalAlignment: Center,
+            VerticalAlignment: Center
+          );
+          Text: "Edit Rank";
+        }
+      }
+    }
+
+    #Content {
+      LayoutMode: TopScrolling;
+      ScrollbarStyle: $C.@DefaultScrollbarStyle;
+      Padding: (Top: 10, Right: 20, Left: 20, Bottom: 20);
+
+      Group {
+        LayoutMode: Top;
+        Anchor: (Bottom: 15);
+
+        Label { Text: "ID"; Style: @FieldLabelStyle; Anchor: (Bottom: 4); }
+        Label { Text: "Unique identifier (lowercase, no spaces)"; Style: @FieldDescStyle; Anchor: (Bottom: 4); }
+        $C.@TextField #IdField {
+          Anchor: (Width: 300, Height: 32, Bottom: 12);
+        }
+
+        Label { Text: "DISPLAY NAME"; Style: @FieldLabelStyle; Anchor: (Bottom: 4); }
+        $C.@TextField #DisplayNameField {
+          Anchor: (Width: 300, Height: 32, Bottom: 12);
+        }
+
+        Label { Text: "PRIORITY"; Style: @FieldLabelStyle; Anchor: (Bottom: 4); }
+        Label { Text: "Higher priority = checked first (0-100)"; Style: @FieldDescStyle; Anchor: (Bottom: 4); }
+        $C.@TextField #PriorityField {
+          Anchor: (Width: 120, Height: 32, Bottom: 12);
+        }
+
+        Label { Text: "MAX HOMES"; Style: @FieldLabelStyle; Anchor: (Bottom: 4); }
+        $C.@TextField #MaxHomesField {
+          Anchor: (Width: 120, Height: 32);
+        }
+      }
+
+      Group #Separator1 {
+        Anchor: (Height: 1, Bottom: 15);
+        Background: (Color: #2b3542);
+      }
+
+      Group {
+        LayoutMode: Top;
+        Anchor: (Bottom: 15);
+
+        Label { Text: "HOME COMMAND"; Style: @SectionLabelStyle; Anchor: (Bottom: 8); }
+
+        Group {
+          LayoutMode: Left;
+          Anchor: (Height: 28);
+
+          $C.@CheckBoxWithLabel #HomeEnabled {
+            @Text = "Enabled";
+            Anchor: (Right: 30);
+          }
+
+          Label { Text: "Cooldown:"; Style: @FieldLabelStyle; Anchor: (Right: 6); }
+          $C.@TextField #HomeCooldownField { Anchor: (Width: 60, Height: 28, Right: 6); }
+          Label { Text: "s"; Style: @FieldDescStyle; Anchor: (Right: 30); }
+
+          Label { Text: "Warmup:"; Style: @FieldLabelStyle; Anchor: (Right: 6); }
+          $C.@TextField #HomeWarmupField { Anchor: (Width: 60, Height: 28, Right: 6); }
+          Label { Text: "s"; Style: @FieldDescStyle; }
+        }
+      }
+
+      Group {
+        LayoutMode: Top;
+        Anchor: (Bottom: 15);
+
+        Label { Text: "WARP COMMAND"; Style: @SectionLabelStyle; Anchor: (Bottom: 8); }
+
+        Group {
+          LayoutMode: Left;
+          Anchor: (Height: 28);
+
+          $C.@CheckBoxWithLabel #WarpEnabled {
+            @Text = "Enabled";
+            Anchor: (Right: 30);
+          }
+
+          Label { Text: "Cooldown:"; Style: @FieldLabelStyle; Anchor: (Right: 6); }
+          $C.@TextField #WarpCooldownField { Anchor: (Width: 60, Height: 28, Right: 6); }
+          Label { Text: "s"; Style: @FieldDescStyle; Anchor: (Right: 30); }
+
+          Label { Text: "Warmup:"; Style: @FieldLabelStyle; Anchor: (Right: 6); }
+          $C.@TextField #WarpWarmupField { Anchor: (Width: 60, Height: 28, Right: 6); }
+          Label { Text: "s"; Style: @FieldDescStyle; }
+        }
+      }
+
+      Group {
+        LayoutMode: Top;
+        Anchor: (Bottom: 15);
+
+        Label { Text: "SPAWN COMMAND"; Style: @SectionLabelStyle; Anchor: (Bottom: 8); }
+
+        Group {
+          LayoutMode: Left;
+          Anchor: (Height: 28);
+
+          $C.@CheckBoxWithLabel #SpawnEnabled {
+            @Text = "Enabled";
+            Anchor: (Right: 30);
+          }
+
+          Label { Text: "Cooldown:"; Style: @FieldLabelStyle; Anchor: (Right: 6); }
+          $C.@TextField #SpawnCooldownField { Anchor: (Width: 60, Height: 28, Right: 6); }
+          Label { Text: "s"; Style: @FieldDescStyle; Anchor: (Right: 30); }
+
+          Label { Text: "Warmup:"; Style: @FieldLabelStyle; Anchor: (Right: 6); }
+          $C.@TextField #SpawnWarmupField { Anchor: (Width: 60, Height: 28, Right: 6); }
+          Label { Text: "s"; Style: @FieldDescStyle; }
+        }
+      }
+
+      Group {
+        LayoutMode: Top;
+        Anchor: (Bottom: 15);
+
+        Label { Text: "BACK COMMAND"; Style: @SectionLabelStyle; Anchor: (Bottom: 8); }
+
+        Group {
+          LayoutMode: Left;
+          Anchor: (Height: 28);
+
+          $C.@CheckBoxWithLabel #BackEnabled {
+            @Text = "Enabled";
+            Anchor: (Right: 30);
+          }
+
+          Label { Text: "Cooldown:"; Style: @FieldLabelStyle; Anchor: (Right: 6); }
+          $C.@TextField #BackCooldownField { Anchor: (Width: 60, Height: 28, Right: 6); }
+          Label { Text: "s"; Style: @FieldDescStyle; Anchor: (Right: 30); }
+
+          Label { Text: "Warmup:"; Style: @FieldLabelStyle; Anchor: (Right: 6); }
+          $C.@TextField #BackWarmupField { Anchor: (Width: 60, Height: 28, Right: 6); }
+          Label { Text: "s"; Style: @FieldDescStyle; }
+        }
+      }
+
+      Group #Separator2 {
+        Anchor: (Height: 1, Bottom: 15);
+        Background: (Color: #2b3542);
+      }
+
+      Group {
+        LayoutMode: Top;
+        Anchor: (Bottom: 15);
+
+        Label { Text: "TPA COMMAND"; Style: @SectionLabelStyle; Anchor: (Bottom: 8); }
+
+        Group {
+          LayoutMode: Left;
+          Anchor: (Height: 28);
+
+          $C.@CheckBoxWithLabel #TpaEnabled {
+            @Text = "Enabled";
+            Anchor: (Right: 30);
+          }
+
+          Label { Text: "Cooldown:"; Style: @FieldLabelStyle; Anchor: (Right: 6); }
+          $C.@TextField #TpaCooldownField { Anchor: (Width: 60, Height: 28, Right: 6); }
+          Label { Text: "s"; Style: @FieldDescStyle; Anchor: (Right: 20); }
+
+          Label { Text: "Warmup:"; Style: @FieldLabelStyle; Anchor: (Right: 6); }
+          $C.@TextField #TpaWarmupField { Anchor: (Width: 60, Height: 28, Right: 6); }
+          Label { Text: "s"; Style: @FieldDescStyle; Anchor: (Right: 20); }
+
+          Label { Text: "Timeout:"; Style: @FieldLabelStyle; Anchor: (Right: 6); }
+          $C.@TextField #TpaTimeoutField { Anchor: (Width: 60, Height: 28, Right: 6); }
+          Label { Text: "s"; Style: @FieldDescStyle; }
+        }
+      }
+
+      Group { FlexWeight: 1; }
+
+      Group {
+        LayoutMode: Left;
+        Anchor: (Height: 50, Top: 15);
+
+        $C.@TextButton #SaveButton {
+          Text: "Save";
+          Anchor: (Width: 120, Height: 44, Right: 12);
+        }
+
+        $C.@CancelTextButton #CancelButton {
+          Text: "Cancel";
+          Anchor: (Width: 120, Height: 44);
+        }
+      }
+    }
+  }
+}
+
+$C.@BackButton {}

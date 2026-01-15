@@ -1,0 +1,63 @@
+$C = "../Common.ui";
+
+Group {
+  LayoutMode: Top;
+  Background: $C.@InputBoxBackground;
+  Padding: (Top: 10, Bottom: 10, Left: 15, Right: 15);
+  Anchor: (Bottom: 8);
+
+  Group {
+    LayoutMode: Left;
+    Anchor: (Height: 26);
+
+    Label #PlayerName {
+      Style: (
+        FontSize: 16,
+        RenderBold: true,
+        TextColor: #ffffff,
+        VerticalAlignment: Center
+      );
+      Padding: (Right: 15);
+    }
+
+    Label #CurrentRank {
+      Style: (
+        FontSize: 12,
+        TextColor: #93844c,
+        VerticalAlignment: Center
+      );
+      Padding: (Right: 15);
+    }
+
+    Group { FlexWeight: 1; }
+
+    $C.@DropdownBox #RankDropdown {
+      Anchor: (Width: 150, Height: 26);
+    }
+
+    $C.@SmallSecondaryTextButton #AddButton {
+      Anchor: (Width: 50, Height: 26, Left: 10);
+      Text: "+";
+    }
+
+    $C.@CancelTextButton #RemoveButton {
+      Anchor: (Width: 50, Height: 26, Left: 5);
+      Text: "-";
+    }
+  }
+
+  Group #RanksList {
+    LayoutMode: Left;
+    Anchor: (Height: 20, Top: 6);
+    Visible: false;
+
+    Label {
+      Text: "Ranks: ";
+      Style: (FontSize: 11, RenderBold: true, TextColor: #93844c, VerticalAlignment: Center);
+    }
+
+    Label #RanksText {
+      Style: (FontSize: 11, TextColor: #96a9be, VerticalAlignment: Center);
+    }
+  }
+}

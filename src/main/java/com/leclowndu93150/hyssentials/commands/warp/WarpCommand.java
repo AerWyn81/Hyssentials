@@ -2,23 +2,19 @@ package com.leclowndu93150.hyssentials.commands.warp;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.math.vector.Vector3d;
-import com.hypixel.hytale.math.vector.Vector3f;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
-import com.hypixel.hytale.server.core.modules.entity.component.HeadRotation;
-import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
-import com.hypixel.hytale.server.core.modules.entity.teleport.Teleport;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.leclowndu93150.hyssentials.data.CommandSettings;
 import com.leclowndu93150.hyssentials.data.LocationData;
-import com.leclowndu93150.hyssentials.manager.BackManager;
 import com.leclowndu93150.hyssentials.manager.CooldownManager;
+import com.leclowndu93150.hyssentials.manager.RankManager;
+import com.leclowndu93150.hyssentials.manager.TeleportWarmupManager;
 import com.leclowndu93150.hyssentials.manager.WarpManager;
 import com.leclowndu93150.hyssentials.util.Permissions;
 import java.util.UUID;
@@ -26,15 +22,18 @@ import javax.annotation.Nonnull;
 
 public class WarpCommand extends AbstractPlayerCommand {
     private final WarpManager warpManager;
-    private final BackManager backManager;
+    private final TeleportWarmupManager warmupManager;
     private final CooldownManager cooldownManager;
+    private final RankManager rankManager;
     private final RequiredArg<String> nameArg = this.withRequiredArg("name", "Warp name", ArgTypes.STRING);
 
-    public WarpCommand(@Nonnull WarpManager warpManager, @Nonnull BackManager backManager, @Nonnull CooldownManager cooldownManager) {
+    public WarpCommand(@Nonnull WarpManager warpManager, @Nonnull TeleportWarmupManager warmupManager,
+                       @Nonnull CooldownManager cooldownManager, @Nonnull RankManager rankManager) {
         super("warp", "Teleport to a server warp");
         this.warpManager = warpManager;
-        this.backManager = backManager;
+        this.warmupManager = warmupManager;
         this.cooldownManager = cooldownManager;
+        this.rankManager = rankManager;
     }
 
     @Override
@@ -47,11 +46,16 @@ public class WarpCommand extends AbstractPlayerCommand {
                           @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
         String name = nameArg.get(context);
         UUID playerUuid = playerRef.getUuid();
-        boolean isVip = Permissions.hasVipCooldown(playerRef);
+        CommandSettings settings = rankManager.getEffectiveSettings(playerRef, CooldownManager.WARP);
         boolean bypassCooldown = Permissions.canBypassCooldown(playerRef);
 
-        if (!bypassCooldown && cooldownManager.isOnCooldown(playerUuid, CooldownManager.WARP, isVip)) {
-            long remaining = cooldownManager.getCooldownRemaining(playerUuid, CooldownManager.WARP, isVip);
+        if (!settings.isEnabled()) {
+            context.sendMessage(Message.raw("You don't have permission to use /warp."));
+            return;
+        }
+
+        if (!bypassCooldown && cooldownManager.isOnCooldown(playerUuid, CooldownManager.WARP, settings.getCooldownSeconds())) {
+            long remaining = cooldownManager.getCooldownRemaining(playerUuid, CooldownManager.WARP, settings.getCooldownSeconds());
             context.sendMessage(Message.raw(String.format("You must wait %d seconds before using /warp again.", remaining)));
             return;
         }
@@ -61,27 +65,8 @@ public class WarpCommand extends AbstractPlayerCommand {
             context.sendMessage(Message.raw(String.format("Warp '%s' not found. Use /warps to see available warps.", name)));
             return;
         }
-        World targetWorld = Universe.get().getWorld(warp.worldName());
-        if (targetWorld == null) {
-            targetWorld = world;
-        }
-        TransformComponent transform = store.getComponent(ref, TransformComponent.getComponentType());
-        HeadRotation headRotation = store.getComponent(ref, HeadRotation.getComponentType());
-        if (transform != null) {
-            Vector3d currentPos = transform.getPosition().clone();
-            Vector3f currentRot = headRotation != null ? headRotation.getRotation().clone() : new Vector3f(0, 0, 0);
-            backManager.saveLocation(playerRef.getUuid(), LocationData.from(world.getName(), currentPos, currentRot));
-        }
-        World finalWorld = targetWorld;
-        world.execute(() -> {
-            Teleport teleport = new Teleport(finalWorld, warp.toPosition(), warp.toRotation());
-            store.addComponent(ref, Teleport.getComponentType(), teleport);
-            if (!bypassCooldown) {
-                cooldownManager.setCooldown(playerUuid, CooldownManager.WARP, isVip);
-            }
-            context.sendMessage(Message.raw(String.format(
-                "Teleporting to warp '%s' at %.1f, %.1f, %.1f",
-                name, warp.x(), warp.y(), warp.z())));
-        });
+
+        int warmupSeconds = bypassCooldown ? 0 : settings.getWarmupSeconds();
+        warmupManager.startWarmup(playerRef, store, ref, world, warp, warmupSeconds, CooldownManager.WARP, "warp '" + name + "'", null);
     }
 }

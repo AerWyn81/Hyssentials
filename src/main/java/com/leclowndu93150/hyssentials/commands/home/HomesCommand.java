@@ -9,17 +9,19 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.leclowndu93150.hyssentials.manager.HomeManager;
-import com.leclowndu93150.hyssentials.util.Permissions;
+import com.leclowndu93150.hyssentials.manager.RankManager;
 import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 
 public class HomesCommand extends AbstractPlayerCommand {
     private final HomeManager homeManager;
+    private final RankManager rankManager;
 
-    public HomesCommand(@Nonnull HomeManager homeManager) {
+    public HomesCommand(@Nonnull HomeManager homeManager, @Nonnull RankManager rankManager) {
         super("homes", "List all your homes");
         this.homeManager = homeManager;
+        this.rankManager = rankManager;
     }
 
     @Override
@@ -37,8 +39,7 @@ public class HomesCommand extends AbstractPlayerCommand {
             return;
         }
         int count = homes.size();
-        boolean hasVipHomes = Permissions.hasVipHomes(playerRef);
-        int max = hasVipHomes ? homeManager.getVipMaxHomes() : homeManager.getMaxHomes();
+        int max = rankManager.getEffectiveMaxHomes(playerRef);
         context.sendMessage(Message.raw(String.format("Your homes (%d/%d):", count, max)));
         for (String home : homes) {
             context.sendMessage(Message.raw("  - " + home));

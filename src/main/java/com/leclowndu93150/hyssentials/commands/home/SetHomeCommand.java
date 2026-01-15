@@ -15,17 +15,19 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.leclowndu93150.hyssentials.manager.HomeManager;
-import com.leclowndu93150.hyssentials.util.Permissions;
+import com.leclowndu93150.hyssentials.manager.RankManager;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 
 public class SetHomeCommand extends AbstractPlayerCommand {
     private final HomeManager homeManager;
+    private final RankManager rankManager;
     private final RequiredArg<String> nameArg = this.withRequiredArg("name", "Home name", ArgTypes.STRING);
 
-    public SetHomeCommand(@Nonnull HomeManager homeManager) {
+    public SetHomeCommand(@Nonnull HomeManager homeManager, @Nonnull RankManager rankManager) {
         super("sethome", "Set a home at your current location");
         this.homeManager = homeManager;
+        this.rankManager = rankManager;
     }
 
     @Override
@@ -46,8 +48,7 @@ public class SetHomeCommand extends AbstractPlayerCommand {
         HeadRotation headRotation = store.getComponent(ref, HeadRotation.getComponentType());
         Vector3f rotation = headRotation != null ? headRotation.getRotation() : new Vector3f(0, 0, 0);
         Vector3d position = transform.getPosition();
-        boolean hasVipHomes = Permissions.hasVipHomes(playerRef);
-        int maxHomes = hasVipHomes ? homeManager.getVipMaxHomes() : homeManager.getMaxHomes();
+        int maxHomes = rankManager.getEffectiveMaxHomes(playerRef);
         boolean success = homeManager.setHome(playerUuid, name, world, position, rotation, maxHomes);
         if (success) {
             context.sendMessage(Message.raw(String.format(

@@ -2,6 +2,7 @@ package com.leclowndu93150.hyssentials.manager;
 
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3f;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.leclowndu93150.hyssentials.data.LocationData;
 import java.util.Collections;
@@ -14,14 +15,12 @@ import javax.annotation.Nullable;
 
 public class HomeManager {
     private final DataManager dataManager;
+    private final RankManager rankManager;
     private final Map<UUID, Map<String, LocationData>> playerHomes;
-    private final int maxHomes;
-    private final int vipMaxHomes;
 
-    public HomeManager(@Nonnull DataManager dataManager, int maxHomes, int vipMaxHomes) {
+    public HomeManager(@Nonnull DataManager dataManager, @Nonnull RankManager rankManager) {
         this.dataManager = dataManager;
-        this.maxHomes = maxHomes;
-        this.vipMaxHomes = vipMaxHomes;
+        this.rankManager = rankManager;
         this.playerHomes = dataManager.loadPlayerHomes();
     }
 
@@ -73,12 +72,8 @@ public class HomeManager {
         return homes == null ? 0 : homes.size();
     }
 
-    public int getMaxHomes() {
-        return maxHomes;
-    }
-
-    public int getVipMaxHomes() {
-        return vipMaxHomes;
+    public int getMaxHomesForPlayer(@Nonnull PlayerRef player) {
+        return rankManager.getEffectiveMaxHomes(player);
     }
 
     public void save() {

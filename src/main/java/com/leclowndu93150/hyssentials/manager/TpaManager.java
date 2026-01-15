@@ -1,6 +1,8 @@
 package com.leclowndu93150.hyssentials.manager;
 
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.leclowndu93150.hyssentials.data.TpaRequest;
+import com.leclowndu93150.hyssentials.data.TpaSettings;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
@@ -11,16 +13,14 @@ import javax.annotation.Nullable;
 public class TpaManager {
     private final Map<UUID, TpaRequest> pendingRequests = new ConcurrentHashMap<>();
     private final Map<UUID, Long> cooldowns = new ConcurrentHashMap<>();
-    private final int timeoutSeconds;
-    private final int cooldownSeconds;
+    private final RankManager rankManager;
 
-    public TpaManager(int timeoutSeconds, int cooldownSeconds) {
-        this.timeoutSeconds = timeoutSeconds;
-        this.cooldownSeconds = cooldownSeconds;
+    public TpaManager(@Nonnull RankManager rankManager) {
+        this.rankManager = rankManager;
     }
 
-    public boolean sendRequest(@Nonnull UUID sender, @Nonnull UUID target, @Nonnull TpaRequest.TpaType type) {
-        cleanupExpired();
+    public boolean sendRequest(@Nonnull UUID sender, @Nonnull UUID target, @Nonnull TpaRequest.TpaType type, int timeoutSeconds) {
+        cleanupExpired(timeoutSeconds);
         if (pendingRequests.containsKey(target)) {
             TpaRequest existing = pendingRequests.get(target);
             if (existing.sender().equals(sender) && !existing.isExpired(timeoutSeconds)) {
@@ -32,8 +32,8 @@ public class TpaManager {
     }
 
     @Nullable
-    public TpaRequest getRequest(@Nonnull UUID target) {
-        cleanupExpired();
+    public TpaRequest getRequest(@Nonnull UUID target, int timeoutSeconds) {
+        cleanupExpired(timeoutSeconds);
         TpaRequest request = pendingRequests.get(target);
         if (request != null && request.isExpired(timeoutSeconds)) {
             pendingRequests.remove(target);
@@ -43,7 +43,7 @@ public class TpaManager {
     }
 
     @Nullable
-    public TpaRequest acceptRequest(@Nonnull UUID target) {
+    public TpaRequest acceptRequest(@Nonnull UUID target, int timeoutSeconds) {
         TpaRequest request = pendingRequests.remove(target);
         if (request != null && !request.isExpired(timeoutSeconds)) {
             return request;
@@ -66,7 +66,10 @@ public class TpaManager {
         return false;
     }
 
-    public boolean isOnCooldown(@Nonnull UUID player) {
+    public boolean isOnCooldown(@Nonnull UUID player, int cooldownSeconds) {
+        if (cooldownSeconds <= 0) {
+            return false;
+        }
         Long lastRequest = cooldowns.get(player);
         if (lastRequest == null) {
             return false;
@@ -74,7 +77,10 @@ public class TpaManager {
         return System.currentTimeMillis() - lastRequest < cooldownSeconds * 1000L;
     }
 
-    public long getCooldownRemaining(@Nonnull UUID player) {
+    public long getCooldownRemaining(@Nonnull UUID player, int cooldownSeconds) {
+        if (cooldownSeconds <= 0) {
+            return 0;
+        }
         Long lastRequest = cooldowns.get(player);
         if (lastRequest == null) {
             return 0;
@@ -87,13 +93,19 @@ public class TpaManager {
         cooldowns.put(player, System.currentTimeMillis());
     }
 
-    private void cleanupExpired() {
+    private void cleanupExpired(int timeoutSeconds) {
         pendingRequests.entrySet().removeIf(entry -> entry.getValue().isExpired(timeoutSeconds));
-        long cutoff = System.currentTimeMillis() - (cooldownSeconds * 1000L);
+        long cutoff = System.currentTimeMillis() - (300 * 1000L);
         cooldowns.entrySet().removeIf(entry -> entry.getValue() < cutoff);
     }
 
-    public int getTimeoutSeconds() {
-        return timeoutSeconds;
+    @Nonnull
+    public TpaSettings getSettingsForPlayer(@Nonnull PlayerRef player) {
+        return rankManager.getEffectiveTpaSettings(player);
+    }
+
+    @Nonnull
+    public RankManager getRankManager() {
+        return rankManager;
     }
 }

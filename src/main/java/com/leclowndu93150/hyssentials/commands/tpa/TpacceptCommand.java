@@ -9,26 +9,30 @@ import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
 import com.hypixel.hytale.server.core.modules.entity.component.HeadRotation;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
-import com.hypixel.hytale.server.core.modules.entity.teleport.Teleport;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.leclowndu93150.hyssentials.data.LocationData;
 import com.leclowndu93150.hyssentials.data.TpaRequest;
-import com.leclowndu93150.hyssentials.manager.BackManager;
+import com.leclowndu93150.hyssentials.data.TpaSettings;
+import com.leclowndu93150.hyssentials.manager.CooldownManager;
+import com.leclowndu93150.hyssentials.manager.RankManager;
+import com.leclowndu93150.hyssentials.manager.TeleportWarmupManager;
 import com.leclowndu93150.hyssentials.manager.TpaManager;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 
 public class TpacceptCommand extends AbstractPlayerCommand {
     private final TpaManager tpaManager;
-    private final BackManager backManager;
+    private final TeleportWarmupManager warmupManager;
+    private final RankManager rankManager;
 
-    public TpacceptCommand(@Nonnull TpaManager tpaManager, @Nonnull BackManager backManager) {
+    public TpacceptCommand(@Nonnull TpaManager tpaManager, @Nonnull TeleportWarmupManager warmupManager, @Nonnull RankManager rankManager) {
         super("tpaccept", "Accept a pending teleport request");
         this.tpaManager = tpaManager;
-        this.backManager = backManager;
+        this.warmupManager = warmupManager;
+        this.rankManager = rankManager;
     }
 
     @Override
@@ -40,7 +44,8 @@ public class TpacceptCommand extends AbstractPlayerCommand {
     protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store,
                           @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
         UUID targetUuid = playerRef.getUuid();
-        TpaRequest request = tpaManager.acceptRequest(targetUuid);
+        TpaSettings settings = rankManager.getEffectiveTpaSettings(playerRef);
+        TpaRequest request = tpaManager.acceptRequest(targetUuid, settings.getTimeoutSeconds());
         if (request == null) {
             context.sendMessage(Message.raw("You have no pending teleport requests."));
             return;
@@ -57,6 +62,7 @@ public class TpacceptCommand extends AbstractPlayerCommand {
         }
         Store<EntityStore> senderStore = senderRef.getStore();
         World senderWorld = senderStore.getExternalData().getWorld();
+
         if (request.type() == TpaRequest.TpaType.TPA) {
             TransformComponent targetTransform = store.getComponent(ref, TransformComponent.getComponentType());
             HeadRotation targetHeadRot = store.getComponent(ref, HeadRotation.getComponentType());
@@ -66,18 +72,10 @@ public class TpacceptCommand extends AbstractPlayerCommand {
             }
             Vector3d targetPos = targetTransform.getPosition().clone();
             Vector3f targetRot = targetHeadRot != null ? targetHeadRot.getRotation().clone() : new Vector3f(0, 0, 0);
-            senderWorld.execute(() -> {
-                TransformComponent senderTransform = senderStore.getComponent(senderRef, TransformComponent.getComponentType());
-                HeadRotation senderHeadRot = senderStore.getComponent(senderRef, HeadRotation.getComponentType());
-                if (senderTransform != null) {
-                    Vector3d senderPos = senderTransform.getPosition().clone();
-                    Vector3f senderRot = senderHeadRot != null ? senderHeadRot.getRotation().clone() : new Vector3f(0, 0, 0);
-                    backManager.saveLocation(request.sender(), LocationData.from(senderWorld.getName(), senderPos, senderRot));
-                }
-                Teleport teleport = new Teleport(world, targetPos, targetRot);
-                senderStore.addComponent(senderRef, Teleport.getComponentType(), teleport);
-                senderPlayer.sendMessage(Message.raw(String.format("Teleporting to %s.", playerRef.getUsername())));
-            });
+            LocationData destination = new LocationData(world.getName(), targetPos.getX(), targetPos.getY(), targetPos.getZ(), targetRot.getPitch(), targetRot.getYaw());
+
+            TpaSettings senderSettings = rankManager.getEffectiveTpaSettings(senderPlayer);
+            warmupManager.startWarmup(senderPlayer, senderStore, senderRef, senderWorld, destination, senderSettings.getWarmupSeconds(), CooldownManager.TPA, playerRef.getUsername(), null);
             context.sendMessage(Message.raw(String.format("Teleport request from %s accepted.", senderPlayer.getUsername())));
         } else {
             TransformComponent senderTransform = senderStore.getComponent(senderRef, TransformComponent.getComponentType());
@@ -86,25 +84,11 @@ public class TpacceptCommand extends AbstractPlayerCommand {
                 context.sendMessage(Message.raw("Could not get sender's position."));
                 return;
             }
-            senderWorld.execute(() -> {
-                TransformComponent currentSenderTransform = senderStore.getComponent(senderRef, TransformComponent.getComponentType());
-                HeadRotation currentSenderHeadRot = senderStore.getComponent(senderRef, HeadRotation.getComponentType());
-                if (currentSenderTransform == null) return;
-                Vector3d senderPos = currentSenderTransform.getPosition().clone();
-                Vector3f senderRot = currentSenderHeadRot != null ? currentSenderHeadRot.getRotation().clone() : new Vector3f(0, 0, 0);
-                world.execute(() -> {
-                    TransformComponent targetTransform = store.getComponent(ref, TransformComponent.getComponentType());
-                    HeadRotation targetHeadRot = store.getComponent(ref, HeadRotation.getComponentType());
-                    if (targetTransform != null) {
-                        Vector3d targetPos = targetTransform.getPosition().clone();
-                        Vector3f targetRot = targetHeadRot != null ? targetHeadRot.getRotation().clone() : new Vector3f(0, 0, 0);
-                        backManager.saveLocation(targetUuid, LocationData.from(world.getName(), targetPos, targetRot));
-                    }
-                    Teleport teleport = new Teleport(senderWorld, senderPos, senderRot);
-                    store.addComponent(ref, Teleport.getComponentType(), teleport);
-                    context.sendMessage(Message.raw(String.format("Teleporting to %s.", senderPlayer.getUsername())));
-                });
-            });
+            Vector3d senderPos = senderTransform.getPosition().clone();
+            Vector3f senderRot = senderHeadRot != null ? senderHeadRot.getRotation().clone() : new Vector3f(0, 0, 0);
+            LocationData destination = new LocationData(senderWorld.getName(), senderPos.getX(), senderPos.getY(), senderPos.getZ(), senderRot.getPitch(), senderRot.getYaw());
+
+            warmupManager.startWarmup(playerRef, store, ref, world, destination, settings.getWarmupSeconds(), CooldownManager.TPA, senderPlayer.getUsername(), null);
             senderPlayer.sendMessage(Message.raw(String.format("%s accepted your teleport request.", playerRef.getUsername())));
         }
     }

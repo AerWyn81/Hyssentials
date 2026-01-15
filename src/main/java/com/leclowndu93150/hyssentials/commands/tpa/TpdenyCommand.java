@@ -31,7 +31,8 @@ public class TpdenyCommand extends AbstractPlayerCommand {
     protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store,
                           @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
         UUID targetUuid = playerRef.getUuid();
-        TpaRequest request = tpaManager.getRequest(targetUuid);
+        int timeoutSeconds = tpaManager.getSettingsForPlayer(playerRef).getTimeoutSeconds();
+        TpaRequest request = tpaManager.getRequest(targetUuid, timeoutSeconds);
         if (request == null) {
             context.sendMessage(Message.raw("You have no pending teleport requests."));
             return;
