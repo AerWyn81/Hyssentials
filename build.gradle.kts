@@ -18,6 +18,8 @@ dependencies {
     compileOnly(libs.jetbrains.annotations)
     compileOnly(libs.jspecify)
 
+    compileOnly(files("libs/ChatCustomization-1.1.1.jar"))
+
     runtimeOnly(libs.bettermodlist)
 }
 

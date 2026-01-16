@@ -10,6 +10,7 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.leclowndu93150.hyssentials.data.AdminChatGroup;
+import com.leclowndu93150.hyssentials.util.ChatUtil;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
@@ -160,13 +161,17 @@ public class AdminChatManager {
      * Broadcasts a message to all players with the given group's permission.
      */
     public void broadcast(@Nonnull AdminChatGroup group, @Nonnull PlayerRef sender, @Nonnull String message) {
-        // Build colored message: [PREFIX] Username: message
-        Message msg = Message.empty()
-            .insert(Message.raw(group.getPrefix()).color(group.getColor()))
-            .insert(Message.raw(" " + sender.getUsername() + ": "))
-            .insert(Message.raw(message).color(group.getColor()));
+        // Build colored message using ChatUtil
+        Message msg = ChatUtil.adminChat(
+            group.getPrefix().replace("[", "").replace("]", ""), // Strip brackets, ChatUtil adds them
+            group.getColor(),
+            sender.getUsername(),
+            message,
+            group.getColor()
+        );
 
-        // Send to all online players with permission
+        // Collect recipients with permission
+        List<PlayerRef> recipients = new ArrayList<>();
         Universe universe = Universe.get();
         if (universe != null) {
             for (Map.Entry<String, World> entry : universe.getWorlds().entrySet()) {
@@ -175,12 +180,15 @@ public class AdminChatManager {
                 if (players != null) {
                     for (PlayerRef player : players) {
                         if (player != null && PermissionsModule.get().hasPermission(player.getUuid(), group.getPermission())) {
-                            player.sendMessage(msg);
+                            recipients.add(player);
                         }
                     }
                 }
             }
         }
+
+        // Broadcast to all recipients
+        ChatUtil.broadcastMessage(recipients, msg);
     }
 
     /**

@@ -2,6 +2,7 @@ package com.leclowndu93150.hyssentials.commands.spawn;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.math.vector.Transform;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3f;
 import com.hypixel.hytale.server.core.Message;
@@ -12,16 +13,17 @@ import com.hypixel.hytale.server.core.modules.entity.component.TransformComponen
 import com.hypixel.hytale.server.core.permissions.HytalePermissions;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.WorldConfig;
+import com.hypixel.hytale.server.core.universe.world.spawn.GlobalSpawnProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.leclowndu93150.hyssentials.manager.SpawnManager;
+import java.text.DecimalFormat;
 import javax.annotation.Nonnull;
 
 public class SetSpawnCommand extends AbstractPlayerCommand {
-    private final SpawnManager spawnManager;
+    private static final DecimalFormat DECIMAL = new DecimalFormat("#.###");
 
-    public SetSpawnCommand(@Nonnull SpawnManager spawnManager) {
-        super("setspawn", "Set the server spawn at your current location");
-        this.spawnManager = spawnManager;
+    public SetSpawnCommand() {
+        super("setspawn", "Set the world spawn at your current location");
         this.requirePermission(HytalePermissions.fromCommand("hyssentials.setspawn"));
     }
 
@@ -33,17 +35,30 @@ public class SetSpawnCommand extends AbstractPlayerCommand {
     @Override
     protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store,
                           @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
-        TransformComponent transform = store.getComponent(ref, TransformComponent.getComponentType());
-        if (transform == null) {
+        TransformComponent transformComponent = store.getComponent(ref, TransformComponent.getComponentType());
+        if (transformComponent == null) {
             context.sendMessage(Message.raw("Could not get your position."));
             return;
         }
+
+        Vector3d position = transformComponent.getPosition().clone();
+
         HeadRotation headRotation = store.getComponent(ref, HeadRotation.getComponentType());
-        Vector3f rotation = headRotation != null ? headRotation.getRotation() : new Vector3f(0, 0, 0);
-        Vector3d position = transform.getPosition();
-        spawnManager.setSpawn(world, position, rotation);
+        Vector3f rotation = headRotation != null ? headRotation.getRotation() : Vector3f.FORWARD;
+
+        Transform transform = new Transform(position, rotation);
+        WorldConfig worldConfig = world.getWorldConfig();
+        worldConfig.setSpawnProvider(new GlobalSpawnProvider(transform));
+        worldConfig.markChanged();
+
         context.sendMessage(Message.raw(String.format(
-            "Custom spawn set at %.1f, %.1f, %.1f in %s",
-            position.getX(), position.getY(), position.getZ(), world.getName())));
+            "World spawn set at %s, %s, %s (rotation: %s, %s, %s)",
+            DECIMAL.format(position.getX()),
+            DECIMAL.format(position.getY()),
+            DECIMAL.format(position.getZ()),
+            DECIMAL.format(rotation.getX()),
+            DECIMAL.format(rotation.getY()),
+            DECIMAL.format(rotation.getZ())
+        )));
     }
 }

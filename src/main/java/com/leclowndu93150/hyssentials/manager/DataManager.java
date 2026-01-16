@@ -91,33 +91,4 @@ public class DataManager {
         Type type = new TypeToken<Map<String, LocationData>>(){}.getType();
         saveData("warps.json", warps, type);
     }
-
-    public LocationData loadSpawn() {
-        Type type = new TypeToken<LocationData>(){}.getType();
-        Path file = dataDirectory.resolve("spawn.json");
-        if (!Files.exists(file, new LinkOption[0])) {
-            return null;
-        }
-        try {
-            String json = Files.readString(file);
-            return GSON.fromJson(json, type);
-        } catch (IOException e) {
-            logger.atSevere().log("Failed to load spawn: %s", e.getMessage());
-        }
-        return null;
-    }
-
-    public void saveSpawn(LocationData spawn) {
-        try {
-            if (!Files.exists(dataDirectory, new LinkOption[0])) {
-                Files.createDirectories(dataDirectory);
-            }
-            Path file = dataDirectory.resolve("spawn.json");
-            String json = GSON.toJson(spawn);
-            Files.writeString(file, json);
-            logger.atFine().log("Saved spawn location");
-        } catch (IOException e) {
-            logger.atSevere().log("Failed to save spawn: %s", e.getMessage());
-        }
-    }
 }

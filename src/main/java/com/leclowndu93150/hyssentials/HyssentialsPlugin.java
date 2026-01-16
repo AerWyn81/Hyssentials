@@ -33,7 +33,6 @@ import com.leclowndu93150.hyssentials.manager.CooldownManager;
 import com.leclowndu93150.hyssentials.manager.DataManager;
 import com.leclowndu93150.hyssentials.manager.HomeManager;
 import com.leclowndu93150.hyssentials.manager.RankManager;
-import com.leclowndu93150.hyssentials.manager.SpawnManager;
 import com.leclowndu93150.hyssentials.manager.TeleportWarmupManager;
 import com.leclowndu93150.hyssentials.manager.TpaManager;
 import com.leclowndu93150.hyssentials.manager.WarpManager;
@@ -50,7 +49,6 @@ public class HyssentialsPlugin extends JavaPlugin {
     private TpaManager tpaManager;
     private HomeManager homeManager;
     private WarpManager warpManager;
-    private SpawnManager spawnManager;
     private BackManager backManager;
     private CooldownManager cooldownManager;
     private TeleportWarmupManager warmupManager;
@@ -77,7 +75,6 @@ public class HyssentialsPlugin extends JavaPlugin {
         this.tpaManager = new TpaManager(this.rankManager);
         this.homeManager = new HomeManager(this.dataManager, this.rankManager);
         this.warpManager = new WarpManager(this.dataManager);
-        this.spawnManager = new SpawnManager(this.dataManager);
         this.msgManager = new PrivateMessageManager();
         this.adminChatManager = new AdminChatManager(this.getDataDirectory(), this.getLogger());
 
@@ -99,8 +96,8 @@ public class HyssentialsPlugin extends JavaPlugin {
         this.getCommandRegistry().registerCommand(new WarpCommand(this.warpManager, this.warmupManager, this.cooldownManager, this.rankManager));
         this.getCommandRegistry().registerCommand(new DelWarpCommand(this.warpManager));
         this.getCommandRegistry().registerCommand(new WarpsCommand(this.warpManager));
-        this.getCommandRegistry().registerCommand(new SetSpawnCommand(this.spawnManager));
-        this.getCommandRegistry().registerCommand(new SpawnCommand(this.spawnManager, this.warmupManager, this.cooldownManager, this.rankManager));
+        this.getCommandRegistry().registerCommand(new SetSpawnCommand());
+        this.getCommandRegistry().registerCommand(new SpawnCommand(this.warmupManager, this.cooldownManager, this.rankManager));
         this.getCommandRegistry().registerCommand(new BackCommand(this.backManager, this.warmupManager, this.cooldownManager, this.rankManager));
         this.getCommandRegistry().registerCommand(new RtpCommand(this.warmupManager, this.cooldownManager, this.rankManager));
         this.getCommandRegistry().registerCommand(new TpCommand(this.backManager));
@@ -119,9 +116,6 @@ public class HyssentialsPlugin extends JavaPlugin {
         }
         if (this.warpManager != null) {
             this.warpManager.save();
-        }
-        if (this.spawnManager != null) {
-            this.spawnManager.save();
         }
         if (this.warmupManager != null) {
             this.warmupManager.shutdown();

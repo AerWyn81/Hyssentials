@@ -10,6 +10,7 @@ import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.leclowndu93150.hyssentials.manager.PrivateMessageManager;
+import com.leclowndu93150.hyssentials.util.ChatUtil;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 
@@ -52,8 +53,8 @@ public class ReplyCommand extends AbstractPlayerCommand {
             return;
         }
 
-        playerRef.sendMessage(Message.raw("[To " + targetPlayer.getUsername() + "] " + message));
-        targetPlayer.sendMessage(Message.raw("[From " + playerRef.getUsername() + "] " + message));
+        ChatUtil.sendMessage(playerRef, ChatUtil.privateMessageTo(targetPlayer.getUsername(), message));
+        ChatUtil.sendMessage(targetPlayer, ChatUtil.privateMessageFrom(playerRef.getUsername(), message));
 
         msgManager.setLastMessaged(playerRef.getUuid(), targetPlayer.getUuid());
     }

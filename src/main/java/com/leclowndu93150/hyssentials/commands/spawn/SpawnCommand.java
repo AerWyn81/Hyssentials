@@ -16,22 +16,19 @@ import com.leclowndu93150.hyssentials.data.CommandSettings;
 import com.leclowndu93150.hyssentials.data.LocationData;
 import com.leclowndu93150.hyssentials.manager.CooldownManager;
 import com.leclowndu93150.hyssentials.manager.RankManager;
-import com.leclowndu93150.hyssentials.manager.SpawnManager;
 import com.leclowndu93150.hyssentials.manager.TeleportWarmupManager;
 import com.leclowndu93150.hyssentials.util.Permissions;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 
 public class SpawnCommand extends AbstractPlayerCommand {
-    private final SpawnManager spawnManager;
     private final TeleportWarmupManager warmupManager;
     private final CooldownManager cooldownManager;
     private final RankManager rankManager;
 
-    public SpawnCommand(@Nonnull SpawnManager spawnManager, @Nonnull TeleportWarmupManager warmupManager,
+    public SpawnCommand(@Nonnull TeleportWarmupManager warmupManager,
                         @Nonnull CooldownManager cooldownManager, @Nonnull RankManager rankManager) {
-        super("spawn", "Teleport to the server spawn");
-        this.spawnManager = spawnManager;
+        super("spawn", "Teleport to the world spawn");
         this.warmupManager = warmupManager;
         this.cooldownManager = cooldownManager;
         this.rankManager = rankManager;
@@ -60,13 +57,6 @@ public class SpawnCommand extends AbstractPlayerCommand {
             return;
         }
 
-        LocationData customSpawn = spawnManager.getSpawn();
-        if (customSpawn != null) {
-            int warmupSeconds = bypassCooldown ? 0 : settings.getWarmupSeconds();
-            warmupManager.startWarmup(playerRef, store, ref, world, customSpawn, warmupSeconds, CooldownManager.SPAWN, "spawn", null);
-            return;
-        }
-
         ISpawnProvider spawnProvider = world.getWorldConfig().getSpawnProvider();
         Transform spawn = spawnProvider.getSpawnPoint(world, playerUuid);
         Vector3d position = spawn.getPosition();
@@ -74,6 +64,6 @@ public class SpawnCommand extends AbstractPlayerCommand {
         LocationData spawnLocation = new LocationData(world.getName(), position.getX(), position.getY(), position.getZ(), rotation.getPitch(), rotation.getYaw());
 
         int warmupSeconds = bypassCooldown ? 0 : settings.getWarmupSeconds();
-        warmupManager.startWarmup(playerRef, store, ref, world, spawnLocation, warmupSeconds, CooldownManager.SPAWN, "world spawn", null);
+        warmupManager.startWarmup(playerRef, store, ref, world, spawnLocation, warmupSeconds, CooldownManager.SPAWN, "spawn", null);
     }
 }
