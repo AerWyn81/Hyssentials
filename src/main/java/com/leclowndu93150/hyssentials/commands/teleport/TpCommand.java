@@ -77,8 +77,7 @@ public class TpCommand extends AbstractPlayerCommand {
             world.execute(() -> {
                 // Use proper body and head rotation like vanilla Hytale
                 Teleport teleport = new Teleport(targetWorld, targetPos, targetBodyRot)
-                    .withHeadRotation(targetHeadRotation)
-                    .withResetRoll();
+                    .setHeadRotation(targetHeadRotation);
                 store.addComponent(ref, Teleport.getComponentType(), teleport);
                 context.sendMessage(Message.raw(String.format("Teleporting to %s.", targetPlayer.getUsername())));
             });

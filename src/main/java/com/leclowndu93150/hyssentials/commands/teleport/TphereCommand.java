@@ -73,8 +73,7 @@ public class TphereCommand extends AbstractPlayerCommand {
             }
             // Use proper body and head rotation like vanilla Hytale
             Teleport teleport = new Teleport(world, myPos, myBodyRot)
-                .withHeadRotation(myRot)
-                .withResetRoll();
+                .setHeadRotation(myRot);
             targetStore.addComponent(targetRef, Teleport.getComponentType(), teleport);
             targetPlayer.sendMessage(Message.raw(String.format("You have been teleported to %s.", playerRef.getUsername())));
         });

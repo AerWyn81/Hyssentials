@@ -2,16 +2,17 @@ package com.leclowndu93150.hyssentials.commands.home;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
-import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
-import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
+import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.leclowndu93150.hyssentials.data.CommandSettings;
 import com.leclowndu93150.hyssentials.data.LocationData;
+import com.leclowndu93150.hyssentials.gui.HomeListGui;
 import com.leclowndu93150.hyssentials.manager.CooldownManager;
 import com.leclowndu93150.hyssentials.manager.HomeManager;
 import com.leclowndu93150.hyssentials.manager.RankManager;
@@ -25,7 +26,6 @@ public class HomeCommand extends AbstractPlayerCommand {
     private final TeleportWarmupManager warmupManager;
     private final CooldownManager cooldownManager;
     private final RankManager rankManager;
-    private final RequiredArg<String> nameArg = this.withRequiredArg("name", "Home name", ArgTypes.STRING);
 
     public HomeCommand(@Nonnull HomeManager homeManager, @Nonnull TeleportWarmupManager warmupManager,
                        @Nonnull CooldownManager cooldownManager, @Nonnull RankManager rankManager) {
@@ -34,6 +34,7 @@ public class HomeCommand extends AbstractPlayerCommand {
         this.warmupManager = warmupManager;
         this.cooldownManager = cooldownManager;
         this.rankManager = rankManager;
+        this.setAllowsExtraArguments(true);
     }
 
     @Override
@@ -44,7 +45,28 @@ public class HomeCommand extends AbstractPlayerCommand {
     @Override
     protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store,
                           @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
-        String name = nameArg.get(context);
+        String input = context.getInputString().trim();
+        String[] args = input.split("\\s+");
+
+        if (args.length <= 1) {
+            openHomeGui(store, ref, playerRef);
+            return;
+        }
+
+        String name = args[1];
+        teleportToHome(context, store, ref, playerRef, world, name);
+    }
+
+    private void openHomeGui(Store<EntityStore> store, Ref<EntityStore> ref, PlayerRef playerRef) {
+        Player player = store.getComponent(ref, Player.getComponentType());
+        if (player == null) return;
+
+        player.getPageManager().openCustomPage(ref, store,
+            new HomeListGui(playerRef, homeManager, warmupManager, cooldownManager, rankManager, CustomPageLifetime.CanDismiss));
+    }
+
+    private void teleportToHome(CommandContext context, Store<EntityStore> store, Ref<EntityStore> ref,
+                                PlayerRef playerRef, World world, String name) {
         UUID playerUuid = playerRef.getUuid();
         CommandSettings settings = rankManager.getEffectiveSettings(playerRef, CooldownManager.HOME);
         boolean bypassCooldown = Permissions.canBypassCooldown(playerRef);

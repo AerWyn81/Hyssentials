@@ -155,7 +155,6 @@ public class TeleportWarmupManager {
     ) {
         UUID playerUuid = playerRef.getUuid();
 
-        // Save current location for /back
         TransformComponent transform = store.getComponent(ref, TransformComponent.getComponentType());
         HeadRotation headRotation = store.getComponent(ref, HeadRotation.getComponentType());
         if (transform != null) {
@@ -169,15 +168,13 @@ public class TeleportWarmupManager {
             targetWorld = currentWorld;
         }
 
-        // Preload chunk before teleporting
         World finalWorld = targetWorld;
         long chunkIndex = ChunkUtil.indexChunkFromBlock((int) destination.x(), (int) destination.z());
 
-        finalWorld.getChunkStore().getChunkReferenceAsync(chunkIndex).thenAccept(chunkRef -> {
+        finalWorld.getChunkStore().getChunkReferenceAsync(chunkIndex, 9).thenAccept(chunkRef -> {
             currentWorld.execute(() -> {
                 Teleport teleport = new Teleport(finalWorld, destination.toPosition(), destination.toBodyRotation())
-                    .withHeadRotation(destination.toHeadRotation())
-                    .withResetRoll();
+                    .setHeadRotation(destination.toHeadRotation());
                 store.addComponent(ref, Teleport.getComponentType(), teleport);
 
                 cooldownManager.setCooldown(playerUuid, commandType);

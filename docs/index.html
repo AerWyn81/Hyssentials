@@ -426,15 +426,16 @@
 
                 <h3>Features</h3>
                 <ul>
-                    <li><strong>Teleport Requests</strong> - TPA system with configurable cooldowns and timeouts</li>
+                    <li><strong>Teleport Requests</strong> - TPA system with configurable cooldowns, timeouts, and player selection UI</li>
                     <li><strong>Private Messaging</strong> - Send private messages with /msg and /r (reply)</li>
                     <li><strong>Admin Chat</strong> - Configurable staff/admin chat channels with /a command</li>
-                    <li><strong>Homes System</strong> - Players can set and teleport to personal home locations</li>
-                    <li><strong>Server Warps</strong> - Admin-defined warp points for all players</li>
+                    <li><strong>Homes System</strong> - Players can set and teleport to personal home locations with an interactive UI</li>
+                    <li><strong>Server Warps</strong> - Admin-defined warp points with a warp selection UI</li>
                     <li><strong>Random Teleport</strong> - Teleport to random safe locations in the world</li>
                     <li><strong>Rank System</strong> - Fully customizable ranks with per-command settings</li>
                     <li><strong>Warmup & Cooldowns</strong> - Configurable delays and cooldowns per rank</li>
                     <li><strong>Admin UI</strong> - In-game graphical interface for rank management</li>
+                    <li><strong>Interactive GUIs</strong> - Run commands without arguments to open selection UIs</li>
                 </ul>
             </section>
 
@@ -491,8 +492,16 @@
                     </thead>
                     <tbody>
                         <tr>
+                            <td><code>/tpa</code></td>
+                            <td>Open the player selection UI to send a TPA request</td>
+                        </tr>
+                        <tr>
                             <td><code>/tpa &lt;player&gt;</code></td>
                             <td>Request to teleport to another player</td>
+                        </tr>
+                        <tr>
+                            <td><code>/tpahere</code></td>
+                            <td>Open the player selection UI to request a player to teleport to you</td>
                         </tr>
                         <tr>
                             <td><code>/tpahere &lt;player&gt;</code></td>
@@ -512,6 +521,12 @@
                         </tr>
                     </tbody>
                 </table>
+
+                <h3>Player Selection UI</h3>
+                <p>Running <code>/tpa</code> or <code>/tpahere</code> without a player name opens an interactive GUI showing all online players:</p>
+
+                <img src="images/tpa-list.png" alt="TPA Player Selection Screen" class="screenshot">
+                <p class="image-caption">Click a player to send them a teleport request</p>
 
                 <div class="callout callout-tip">
                     <div class="callout-title">Timeout</div>
@@ -573,6 +588,10 @@
                             <td>Save your current location as a home</td>
                         </tr>
                         <tr>
+                            <td><code>/home</code></td>
+                            <td>Open the home selection UI</td>
+                        </tr>
+                        <tr>
                             <td><code>/home &lt;name&gt;</code></td>
                             <td>Teleport to a saved home</td>
                         </tr>
@@ -586,6 +605,12 @@
                         </tr>
                     </tbody>
                 </table>
+
+                <h3>Home Selection UI</h3>
+                <p>Running <code>/home</code> without a name opens an interactive GUI showing all your homes:</p>
+
+                <img src="images/home-list.png" alt="Home Selection Screen" class="screenshot">
+                <p class="image-caption">View, teleport to, or delete your homes from the UI</p>
 
                 <h4>Home Limits</h4>
                 <p>The number of homes a player can set is determined by their rank. Default players get 5 homes, while VIP players get 10. This is fully customizable in the rank settings.</p>
@@ -605,6 +630,11 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <tr>
+                            <td><code>/warp</code></td>
+                            <td>Open the warp selection UI</td>
+                            <td>Everyone</td>
+                        </tr>
                         <tr>
                             <td><code>/warp &lt;name&gt;</code></td>
                             <td>Teleport to a warp</td>
@@ -627,6 +657,12 @@
                         </tr>
                     </tbody>
                 </table>
+
+                <h3>Warp Selection UI</h3>
+                <p>Running <code>/warp</code> without a name opens an interactive GUI showing all server warps:</p>
+
+                <img src="images/warp-list.png" alt="Warp Selection Screen" class="screenshot">
+                <p class="image-caption">Browse and teleport to server warps from the UI</p>
             </section>
 
             <!-- Spawn -->

@@ -26,7 +26,7 @@ public record LocationData(
     }
 
     /**
-     * Returns head rotation for the Teleport.withHeadRotation() call.
+     * Returns head rotation for the Teleport.setHeadRotation() call.
      * Head rotation uses both pitch (vertical look) and yaw (horizontal look).
      * Vector3f constructor is (pitch, yaw, roll).
      */

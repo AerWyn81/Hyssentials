@@ -1,0 +1,29 @@
+$C = "../Common.ui";
+
+Group {
+  LayoutMode: Top;
+  Background: $C.@InputBoxBackground;
+  Padding: (Top: 10, Bottom: 10, Left: 15, Right: 15);
+  Anchor: (Bottom: 8);
+
+  Group {
+    LayoutMode: Left;
+    Anchor: (Height: 26);
+
+    Label #PlayerName {
+      Style: (
+        FontSize: 16,
+        RenderBold: true,
+        TextColor: #ffffff,
+        VerticalAlignment: Center
+      );
+    }
+
+    Group { FlexWeight: 1; }
+
+    $C.@SmallSecondaryTextButton #RequestButton {
+      Anchor: (Width: 80, Height: 26);
+      Text: "Request";
+    }
+  }
+}

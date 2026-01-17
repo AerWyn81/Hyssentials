@@ -26,9 +26,10 @@ public class RtpCommand extends AbstractPlayerCommand {
     public static final String RTP = "rtp";
     private static final int DEFAULT_MIN_RANGE = 100;
     private static final int DEFAULT_MAX_RANGE = 5000;
-    private static final int MAX_ATTEMPTS = 10;
+    private static final int MAX_ATTEMPTS = 15;
     private static final int MIN_Y = 1;
     private static final int MAX_Y = 256;
+    private static final int MIN_SKY_LIGHT = 10; // Minimum sky light to avoid caves
 
     private final TeleportWarmupManager warmupManager;
     private final CooldownManager cooldownManager;
@@ -146,6 +147,23 @@ public class RtpCommand extends AbstractPlayerCommand {
 
             // Check: solid ground, air at feet level, air at head level
             if (blockBelow != 0 && blockAt == 0 && blockAbove == 0) {
+                // Check for water/fluid at feet, head, or ground level
+                int fluidAtFeet = chunk.getFluidId(localX, y, localZ);
+                int fluidAtHead = chunk.getFluidId(localX, y + 1, localZ);
+                int fluidBelow = chunk.getFluidId(localX, y - 1, localZ);
+
+                if (fluidAtFeet != 0 || fluidAtHead != 0 || fluidBelow != 0) {
+                    continue; // Skip locations with water/fluid
+                }
+
+                // Check sky light to avoid caves (need sufficient sky light)
+                if (chunk.getBlockChunk() != null) {
+                    byte skyLight = chunk.getBlockChunk().getSkyLight(localX, y, localZ);
+                    if (skyLight < MIN_SKY_LIGHT) {
+                        continue; // Skip cave locations (no sky access)
+                    }
+                }
+
                 return y - 1; // Return the Y of the solid block
             }
         }

@@ -1,0 +1,52 @@
+$C = "../Common.ui";
+
+Group {
+  LayoutMode: Top;
+  Background: $C.@InputBoxBackground;
+  Padding: (Top: 10, Bottom: 10, Left: 15, Right: 15);
+  Anchor: (Bottom: 8);
+
+  Group {
+    LayoutMode: Left;
+    Anchor: (Height: 26);
+
+    Label #HomeName {
+      Style: (
+        FontSize: 16,
+        RenderBold: true,
+        TextColor: #ffffff,
+        VerticalAlignment: Center
+      );
+      Padding: (Right: 15);
+    }
+
+    Label #HomeWorld {
+      Style: (
+        FontSize: 12,
+        TextColor: #93844c,
+        VerticalAlignment: Center
+      );
+      Padding: (Right: 15);
+    }
+
+    Label #HomeCoords {
+      Style: (
+        FontSize: 12,
+        TextColor: #ffffff(0.4),
+        VerticalAlignment: Center
+      );
+    }
+
+    Group { FlexWeight: 1; }
+
+    $C.@SmallSecondaryTextButton #TeleportButton {
+      Anchor: (Width: 80, Height: 26, Right: 10);
+      Text: "Teleport";
+    }
+
+    $C.@CancelTextButton #DeleteButton {
+      Anchor: (Width: 40, Height: 26);
+      Text: "X";
+    }
+  }
+}
