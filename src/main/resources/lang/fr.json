@@ -103,5 +103,83 @@
   "pm": {
     "to": "<gray>[Vers <yellow>%s</yellow>] </gray>",
     "from": "<gray>[De <yellow>%s</yellow>] </gray>"
+  },
+  "ui": {
+    "home_list": {
+      "title": "Vos Homes",
+      "title_count": "Vos Homes (%d/%d)"
+    },
+    "warp_list": {
+      "title": "Warps du Serveur"
+    },
+    "rank_list": {
+      "title": "Gestion des Rangs"
+    },
+    "rank_editor": {
+      "title_new": "Créer un Nouveau Rang",
+      "title_edit": "Modifier le Rang : %s"
+    },
+    "tpa_list": {
+      "title": "Demandes de Téléportation",
+      "title_tpa": "Se Téléporter vers un Joueur",
+      "title_tpahere": "Demander un Joueur Ici",
+      "no_players": "Aucun autre joueur en ligne",
+      "request_received": "%s a demandé à se téléporter vers vous. Tapez /tpaccept pour accepter ou /tpdeny pour refuser. Expire dans %d secondes.",
+      "request_here_received": "%s vous demande de vous téléporter vers lui. Tapez /tpaccept pour accepter ou /tpdeny pour refuser. Expire dans %d secondes."
+    },
+    "player_assign": {
+      "title": "Assigner des Rangs"
+    },
+    "btn": {
+      "close": "Fermer",
+      "teleport": "Téléporter",
+      "delete_confirm": "?",
+      "create_new": "Créer",
+      "edit": "Modifier",
+      "save": "Enregistrer",
+      "cancel": "Annuler"
+    },
+    "label": {
+      "permission": "Permission : ",
+      "id_prefix": "ID : ",
+      "priority_prefix": "Priorité : ",
+      "id": "ID",
+      "id_desc": "Identifiant unique (minuscules, sans espaces)",
+      "display_name": "NOM D'AFFICHAGE",
+      "priority": "PRIORITÉ",
+      "priority_desc": "Priorité élevée = vérifié en premier (0-100)",
+      "max_homes": "MAX HOMES",
+      "enabled": "Activé",
+      "cooldown": "Délai :",
+      "warmup": "Préparation :",
+      "timeout": "Expiration :",
+      "current_rank": "Actuel : "
+    },
+    "section": {
+      "home_command": "COMMANDE HOME",
+      "warp_command": "COMMANDE WARP",
+      "spawn_command": "COMMANDE SPAWN",
+      "back_command": "COMMANDE BACK",
+      "tpa_command": "COMMANDE TPA",
+      "rtp_command": "COMMANDE RTP (Téléportation Aléatoire)",
+      "permissions": "PERMISSIONS ACCORDÉES",
+      "permissions_desc": "Permissions supplémentaires accordées aux joueurs avec ce rang"
+    },
+    "error": {
+      "no_home_permission": "Vous n'avez pas la permission d'utiliser les homes.",
+      "home_cooldown": "Vous devez attendre %d secondes avant d'utiliser /home à nouveau.",
+      "home_not_found": "Home '%s' introuvable.",
+      "no_warp_permission": "Vous n'avez pas la permission d'utiliser les warps.",
+      "warp_cooldown": "Vous devez attendre %d secondes avant d'utiliser /warp à nouveau.",
+      "warp_not_found": "Warp '%s' introuvable.",
+      "no_tpa_permission": "Vous n'avez pas la permission d'utiliser %s.",
+      "tpa_cooldown": "Vous devez attendre %d secondes avant d'envoyer une autre demande.",
+      "invalid_player": "Joueur invalide.",
+      "player_offline": "Le joueur n'est plus en ligne.",
+      "already_pending": "Vous avez déjà une demande en attente vers ce joueur."
+    },
+    "success": {
+      "tpa_sent": "Demande de téléportation envoyée à %s."
+    }
   }
 }

@@ -103,5 +103,83 @@
   "pm": {
     "to": "<gray>[To <yellow>%s</yellow>] </gray>",
     "from": "<gray>[From <yellow>%s</yellow>] </gray>"
+  },
+  "ui": {
+    "home_list": {
+      "title": "Your Homes",
+      "title_count": "Your Homes (%d/%d)"
+    },
+    "warp_list": {
+      "title": "Server Warps"
+    },
+    "rank_list": {
+      "title": "Rank Management"
+    },
+    "rank_editor": {
+      "title_new": "Create New Rank",
+      "title_edit": "Edit Rank: %s"
+    },
+    "tpa_list": {
+      "title": "Teleport Requests",
+      "title_tpa": "Teleport to Player",
+      "title_tpahere": "Request Player Here",
+      "no_players": "No other players online",
+      "request_received": "%s has requested to teleport to you. Type /tpaccept to accept or /tpdeny to deny. Expires in %d seconds.",
+      "request_here_received": "%s has requested you to teleport to them. Type /tpaccept to accept or /tpdeny to deny. Expires in %d seconds."
+    },
+    "player_assign": {
+      "title": "Assign Ranks"
+    },
+    "btn": {
+      "close": "Close",
+      "teleport": "Teleport",
+      "delete_confirm": "?",
+      "create_new": "Create New",
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "label": {
+      "permission": "Permission: ",
+      "id_prefix": "ID: ",
+      "priority_prefix": "Priority: ",
+      "id": "ID",
+      "id_desc": "Unique identifier (lowercase, no spaces)",
+      "display_name": "DISPLAY NAME",
+      "priority": "PRIORITY",
+      "priority_desc": "Higher priority = checked first (0-100)",
+      "max_homes": "MAX HOMES",
+      "enabled": "Enabled",
+      "cooldown": "Cooldown:",
+      "warmup": "Warmup:",
+      "timeout": "Timeout:",
+      "current_rank": "Current: "
+    },
+    "section": {
+      "home_command": "HOME COMMAND",
+      "warp_command": "WARP COMMAND",
+      "spawn_command": "SPAWN COMMAND",
+      "back_command": "BACK COMMAND",
+      "tpa_command": "TPA COMMAND",
+      "rtp_command": "RTP COMMAND (Random Teleport)",
+      "permissions": "GRANTED PERMISSIONS",
+      "permissions_desc": "Extra permissions granted to players with this rank"
+    },
+    "error": {
+      "no_home_permission": "You don't have permission to use homes.",
+      "home_cooldown": "You must wait %d seconds before using /home again.",
+      "home_not_found": "Home '%s' not found.",
+      "no_warp_permission": "You don't have permission to use warps.",
+      "warp_cooldown": "You must wait %d seconds before using /warp again.",
+      "warp_not_found": "Warp '%s' not found.",
+      "no_tpa_permission": "You don't have permission to use %s.",
+      "tpa_cooldown": "You must wait %d seconds before sending another request.",
+      "invalid_player": "Invalid player.",
+      "player_offline": "Player is no longer online.",
+      "already_pending": "You already have a pending request to this player."
+    },
+    "success": {
+      "tpa_sent": "Teleport request sent to %s."
+    }
   }
 }
