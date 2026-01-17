@@ -6,13 +6,20 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.event.events.player.DrainPlayerFromWorldEvent;
+import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
+import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.WorldConfig;
 import com.leclowndu93150.hyssentials.data.JoinMessageConfig;
+import com.leclowndu93150.hyssentials.util.ChatUtil;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import javax.annotation.Nonnull;
 
 public class JoinMessageManager {
@@ -22,6 +29,7 @@ public class JoinMessageManager {
     private final Path dataDirectory;
     private final HytaleLogger logger;
     private JoinMessageConfig config;
+    private final Set<UUID> connectedPlayers = new HashSet<>();
 
     public JoinMessageManager(@Nonnull Path dataDirectory, @Nonnull HytaleLogger logger) {
         this.dataDirectory = dataDirectory;
@@ -70,12 +78,57 @@ public class JoinMessageManager {
         return config;
     }
 
-    public void onPlayerJoinWorld(@Nonnull AddPlayerToWorldEvent event) {
+    public void onPlayerConnect(@Nonnull PlayerConnectEvent event) {
+        PlayerRef playerRef = event.getPlayerRef();
+        connectedPlayers.add(playerRef.getUuid());
+
         if (!config.enabled()) {
             return;
         }
 
+        String playerName = playerRef.getUsername();
+        String formattedMessage = config.formatServerJoinMessage(playerName);
+        Message message = ChatUtil.parseFormatted(formattedMessage);
+
+        World world = event.getWorld();
+        if (world != null) {
+            for (PlayerRef player : world.getPlayerRefs()) {
+                player.sendMessage(message);
+            }
+        }
+    }
+
+    public void onPlayerDisconnect(@Nonnull PlayerDisconnectEvent event) {
+        PlayerRef playerRef = event.getPlayerRef();
+        connectedPlayers.remove(playerRef.getUuid());
+
+        if (!config.enabled()) {
+            return;
+        }
+
+        String playerName = playerRef.getUsername();
+        String formattedMessage = config.formatServerLeaveMessage(playerName);
+        Message message = ChatUtil.parseFormatted(formattedMessage);
+
+        UUID worldUuid = playerRef.getWorldUuid();
+        if (worldUuid != null) {
+            World world = Universe.get().getWorld(worldUuid);
+            if (world != null) {
+                for (PlayerRef player : world.getPlayerRefs()) {
+                    if (!player.getUuid().equals(playerRef.getUuid())) {
+                        player.sendMessage(message);
+                    }
+                }
+            }
+        }
+    }
+
+    public void onPlayerEnterWorld(@Nonnull AddPlayerToWorldEvent event) {
         event.setBroadcastJoinMessage(false);
+
+        if (!config.enabled()) {
+            return;
+        }
 
         World world = event.getWorld();
         PlayerRef playerRef = event.getHolder().getComponent(PlayerRef.getComponentType());
@@ -83,14 +136,19 @@ public class JoinMessageManager {
             return;
         }
 
+        if (!connectedPlayers.contains(playerRef.getUuid())) {
+            return;
+        }
+
         String playerName = playerRef.getUsername();
         String worldName = getWorldDisplayName(world);
-        String formattedMessage = config.formatJoinMessage(playerName, worldName);
+        String formattedMessage = config.formatWorldEnterMessage(playerName, worldName);
+        Message message = ChatUtil.parseFormatted(formattedMessage);
 
         for (PlayerRef player : world.getPlayerRefs()) {
-            player.sendMessage(Message.raw(formattedMessage));
+            player.sendMessage(message);
         }
-        playerRef.sendMessage(Message.raw(formattedMessage));
+        playerRef.sendMessage(message);
     }
 
     public void onPlayerLeaveWorld(@Nonnull DrainPlayerFromWorldEvent event) {
@@ -104,13 +162,18 @@ public class JoinMessageManager {
             return;
         }
 
+        if (!connectedPlayers.contains(playerRef.getUuid())) {
+            return;
+        }
+
         String playerName = playerRef.getUsername();
         String worldName = getWorldDisplayName(world);
-        String formattedMessage = config.formatLeaveMessage(playerName, worldName);
+        String formattedMessage = config.formatWorldLeaveMessage(playerName, worldName);
+        Message message = ChatUtil.parseFormatted(formattedMessage);
 
         for (PlayerRef player : world.getPlayerRefs()) {
             if (!player.getUuid().equals(playerRef.getUuid())) {
-                player.sendMessage(Message.raw(formattedMessage));
+                player.sendMessage(message);
             }
         }
     }

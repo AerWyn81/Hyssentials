@@ -5,7 +5,11 @@ import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.plugin.PluginManager;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.leclowndu93150.chatcustomization.util.ColorUtil;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -15,6 +19,7 @@ import javax.annotation.Nullable;
  */
 public final class ChatUtil {
     private static final PluginIdentifier CHAT_CUSTOMIZATION_ID = new PluginIdentifier("com.leclowndu93150", "ChatCustomization");
+    private static final Pattern FORMAT_CODE_PATTERN = Pattern.compile("&(#[0-9A-Fa-f]{6}|[bilmru])");
 
     private ChatUtil() {}
 
@@ -118,5 +123,89 @@ public final class ChatUtil {
         return Message.empty()
             .insert(Message.raw("[From " + senderName + "] ").color("#AAAAAA"))
             .insert(Message.raw(message).color("#FFFFFF"));
+    }
+
+    /**
+     * Parses a string with format codes and returns a formatted Message.
+     * Supports:
+     * - &b = bold
+     * - &i = italic
+     * - &u = underline
+     * - &m = monospace
+     * - &r = reset (clears all formatting)
+     * - &#RRGGBB = hex color (e.g., &#FF5555 for red)
+     * - &l = bold (alias, for familiarity)
+     */
+    @Nonnull
+    public static Message parseFormatted(@Nonnull String text) {
+        if (!text.contains("&")) {
+            return Message.raw(text);
+        }
+
+        List<Message> parts = new ArrayList<>();
+        Matcher matcher = FORMAT_CODE_PATTERN.matcher(text);
+
+        boolean bold = false;
+        boolean italic = false;
+        boolean underline = false;
+        boolean monospace = false;
+        String color = null;
+
+        int lastEnd = 0;
+
+        while (matcher.find()) {
+            if (matcher.start() > lastEnd) {
+                String segment = text.substring(lastEnd, matcher.start());
+                parts.add(applyFormat(segment, bold, italic, underline, monospace, color));
+            }
+
+            String code = matcher.group(1);
+            if (code.startsWith("#")) {
+                color = code.toUpperCase();
+            } else {
+                switch (code.toLowerCase()) {
+                    case "b", "l" -> bold = true;
+                    case "i" -> italic = true;
+                    case "u" -> underline = true;
+                    case "m" -> monospace = true;
+                    case "r" -> {
+                        bold = false;
+                        italic = false;
+                        underline = false;
+                        monospace = false;
+                        color = null;
+                    }
+                }
+            }
+            lastEnd = matcher.end();
+        }
+
+        if (lastEnd < text.length()) {
+            String segment = text.substring(lastEnd);
+            parts.add(applyFormat(segment, bold, italic, underline, monospace, color));
+        }
+
+        if (parts.isEmpty()) {
+            return Message.empty();
+        }
+        if (parts.size() == 1) {
+            return parts.get(0);
+        }
+
+        Message result = Message.empty();
+        for (Message part : parts) {
+            result.insert(part);
+        }
+        return result;
+    }
+
+    private static Message applyFormat(String text, boolean bold, boolean italic,
+                                       boolean underline, boolean monospace, @Nullable String color) {
+        Message msg = Message.raw(text);
+        if (bold) msg.bold(true);
+        if (italic) msg.italic(true);
+        if (monospace) msg.monospace(true);
+        if (color != null) msg.color(color);
+        return msg;
     }
 }

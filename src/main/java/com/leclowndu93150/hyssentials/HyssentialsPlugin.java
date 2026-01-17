@@ -92,12 +92,9 @@ public class HyssentialsPlugin extends JavaPlugin {
 
         this.getEntityStoreRegistry().registerSystem(new PlayerDeathBackSystem(this.backManager));
 
-        // Register player connect/disconnect events for vanish
         this.getEventRegistry().register(PlayerConnectEvent.class, this::onPlayerConnect);
         this.getEventRegistry().register(PlayerDisconnectEvent.class, this::onPlayerDisconnect);
-
-        // Register world join/leave events for custom messages
-        this.getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, this.joinMessageManager::onPlayerJoinWorld);
+        this.getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, this.joinMessageManager::onPlayerEnterWorld);
         this.getEventRegistry().registerGlobal(DrainPlayerFromWorldEvent.class, this.joinMessageManager::onPlayerLeaveWorld);
     }
 
@@ -132,8 +129,8 @@ public class HyssentialsPlugin extends JavaPlugin {
 
     private void onPlayerConnect(@Nonnull PlayerConnectEvent event) {
         vanishManager.onPlayerJoin(event.getPlayerRef());
+        joinMessageManager.onPlayerConnect(event);
 
-        // Grant default rank to new players if they don't have any rank
         PlayerRef player = event.getPlayerRef();
         if (!playerHasAnyRank(player)) {
             rankManager.grantRankPermission(player.getUuid(), rankManager.getDefaultRankId());
@@ -151,6 +148,7 @@ public class HyssentialsPlugin extends JavaPlugin {
     }
 
     private void onPlayerDisconnect(@Nonnull PlayerDisconnectEvent event) {
+        joinMessageManager.onPlayerDisconnect(event);
         vanishManager.onPlayerLeave(event.getPlayerRef().getUuid());
     }
 

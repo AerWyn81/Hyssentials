@@ -413,6 +413,7 @@
                 <a href="#ranks-json" class="nav-link">ranks.json</a>
                 <a href="#adminchat-json" class="nav-link">adminchat.json</a>
                 <a href="#joinmessages-json" class="nav-link">joinmessages.json</a>
+                <a href="#formatting-guide" class="nav-link">Formatting Guide</a>
                 <a href="#permissions" class="nav-link">Permissions</a>
             </div>
         </nav>
@@ -907,15 +908,52 @@
             <!-- Custom Join Messages -->
             <section id="custom-join-messages" class="section">
                 <h2>Custom Join/Leave Messages</h2>
-                <p>Customize the messages shown when players join or leave the world. By default, this feature is disabled and Hytale's default messages are used.</p>
+                <p>Customize the messages shown when players connect to the server or move between worlds/instances. By default, this feature is disabled and Hytale's default messages are used.</p>
+
+                <h3>Message Types</h3>
+                <p>Hyssentials distinguishes between <strong>server connections</strong> and <strong>world transitions</strong>:</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Message</th>
+                            <th>When Shown</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>serverJoinMessage</code></td>
+                            <td>Player connects to the server (login)</td>
+                        </tr>
+                        <tr>
+                            <td><code>serverLeaveMessage</code></td>
+                            <td>Player disconnects from the server (logout)</td>
+                        </tr>
+                        <tr>
+                            <td><code>worldEnterMessage</code></td>
+                            <td>Player enters a world/instance (e.g., The Forgotten Temple)</td>
+                        </tr>
+                        <tr>
+                            <td><code>worldLeaveMessage</code></td>
+                            <td>Player leaves a world/instance to go to another</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="callout callout-info">
+                    <div class="callout-title">Why Split Messages?</div>
+                    <p>This prevents confusion between players actually logging off versus simply entering a dungeon or instance. Server messages are for real connections, world messages are for instance transitions.</p>
+                </div>
 
                 <h3>Configuration</h3>
                 <p>Edit <code>joinmessages.json</code> in the plugin data folder:</p>
 
 <pre><code>{
   "enabled": true,
-  "joinMessage": "{player} has entered {world}",
-  "leaveMessage": "{player} has left {world}"
+  "serverJoinMessage": "&#55FF55&b{player} &rhas joined the server",
+  "serverLeaveMessage": "&#FF5555&b{player} &rhas left the server",
+  "worldEnterMessage": "&#AAAAAA{player} entered &#FFAA00{world}",
+  "worldLeaveMessage": "&#AAAAAA{player} left &#FFAA00{world}"
 }</code></pre>
 
                 <h3>Placeholders</h3>
@@ -923,28 +961,45 @@
                     <thead>
                         <tr>
                             <th>Placeholder</th>
+                            <th>Available In</th>
                             <th>Description</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td><code>{player}</code></td>
+                            <td>All messages</td>
                             <td>The player's username</td>
                         </tr>
                         <tr>
                             <td><code>{world}</code></td>
-                            <td>The world's display name</td>
+                            <td>World messages only</td>
+                            <td>The world/instance display name</td>
                         </tr>
                     </tbody>
                 </table>
 
-                <h3>Example Messages</h3>
-                <ul>
-                    <li><code>{player} has returned to {world}</code></li>
-                    <li><code>Welcome {player} to {world}!</code></li>
-                    <li><code>{player} joined the server</code></li>
-                    <li><code>Goodbye {player}!</code></li>
-                </ul>
+                <h3>Formatting</h3>
+                <p>Messages support color and style formatting. See the <a href="#formatting-guide">Formatting Guide</a> for details.</p>
+
+                <h3>Example Configurations</h3>
+                <h4>Simple (No Colors)</h4>
+<pre><code>{
+  "enabled": true,
+  "serverJoinMessage": "{player} has joined the server",
+  "serverLeaveMessage": "{player} has left the server",
+  "worldEnterMessage": "{player} entered {world}",
+  "worldLeaveMessage": "{player} left {world}"
+}</code></pre>
+
+                <h4>Colorful</h4>
+<pre><code>{
+  "enabled": true,
+  "serverJoinMessage": "&#55FF55+ &b{player} &rjoined",
+  "serverLeaveMessage": "&#FF5555- &b{player} &rleft",
+  "worldEnterMessage": "&#888888{player} → &#FFAA00{world}",
+  "worldLeaveMessage": "&#888888{player} ← &#FFAA00{world}"
+}</code></pre>
 
                 <div class="callout callout-tip">
                     <div class="callout-title">Tip</div>
@@ -1206,8 +1261,10 @@
 
                 <pre><code>{
   "enabled": false,
-  "joinMessage": "{player} has joined {world}",
-  "leaveMessage": "{player} has left {world}"
+  "serverJoinMessage": "{player} has joined the server",
+  "serverLeaveMessage": "{player} has left the server",
+  "worldEnterMessage": "{player} entered {world}",
+  "worldLeaveMessage": "{player} left {world}"
 }</code></pre>
 
                 <h3>Properties</h3>
@@ -1226,14 +1283,24 @@
                             <td>Set to <code>true</code> to use custom messages, <code>false</code> for default Hytale messages</td>
                         </tr>
                         <tr>
-                            <td><code>joinMessage</code></td>
+                            <td><code>serverJoinMessage</code></td>
                             <td>string</td>
-                            <td>Message shown when a player joins. Use <code>{player}</code> and <code>{world}</code> placeholders</td>
+                            <td>Message shown when a player connects to the server. Supports <code>{player}</code> placeholder and formatting codes.</td>
                         </tr>
                         <tr>
-                            <td><code>leaveMessage</code></td>
+                            <td><code>serverLeaveMessage</code></td>
                             <td>string</td>
-                            <td>Message shown when a player leaves. Use <code>{player}</code> and <code>{world}</code> placeholders</td>
+                            <td>Message shown when a player disconnects from the server. Supports <code>{player}</code> placeholder and formatting codes.</td>
+                        </tr>
+                        <tr>
+                            <td><code>worldEnterMessage</code></td>
+                            <td>string</td>
+                            <td>Message shown when a player enters a world/instance. Supports <code>{player}</code>, <code>{world}</code> placeholders and formatting codes.</td>
+                        </tr>
+                        <tr>
+                            <td><code>worldLeaveMessage</code></td>
+                            <td>string</td>
+                            <td>Message shown when a player leaves a world/instance. Supports <code>{player}</code>, <code>{world}</code> placeholders and formatting codes.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1241,6 +1308,185 @@
                 <div class="callout callout-info">
                     <div class="callout-title">Note</div>
                     <p>This feature is disabled by default. Set <code>enabled</code> to <code>true</code> to use your custom messages instead of Hytale's built-in join/leave announcements.</p>
+                </div>
+            </section>
+
+            <!-- Formatting Guide -->
+            <section id="formatting-guide" class="section">
+                <h2>Formatting Guide</h2>
+                <p>Hyssentials supports formatting codes in join/leave messages to add colors and text styles. Use the <code>&</code> symbol followed by a code.</p>
+
+                <h3>Style Codes</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Effect</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>&b</code> or <code>&l</code></td>
+                            <td><strong>Bold</strong></td>
+                            <td><code>&bHello</code> → <strong>Hello</strong></td>
+                        </tr>
+                        <tr>
+                            <td><code>&i</code></td>
+                            <td><em>Italic</em></td>
+                            <td><code>&iHello</code> → <em>Hello</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>&u</code></td>
+                            <td><u>Underline</u></td>
+                            <td><code>&uHello</code> → <u>Hello</u></td>
+                        </tr>
+                        <tr>
+                            <td><code>&m</code></td>
+                            <td><code>Monospace</code></td>
+                            <td><code>&mHello</code> → <code>Hello</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>&r</code></td>
+                            <td>Reset (clear all formatting)</td>
+                            <td><code>&bBold &rNormal</code> → <strong>Bold</strong> Normal</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Color Codes</h3>
+                <p>Use <code>&</code> followed by a hex color code to set text color:</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Format</th>
+                            <th>Example</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>&#RRGGBB</code></td>
+                            <td><code>&#FF5555Hello</code></td>
+                            <td><span style="color: #FF5555;">Hello</span> (red)</td>
+                        </tr>
+                        <tr>
+                            <td><code>&#RRGGBB</code></td>
+                            <td><code>&#55FF55Hello</code></td>
+                            <td><span style="color: #55FF55;">Hello</span> (green)</td>
+                        </tr>
+                        <tr>
+                            <td><code>&#RRGGBB</code></td>
+                            <td><code>&#5555FFHello</code></td>
+                            <td><span style="color: #5555FF;">Hello</span> (blue)</td>
+                        </tr>
+                        <tr>
+                            <td><code>&#RRGGBB</code></td>
+                            <td><code>&#FFAA00Hello</code></td>
+                            <td><span style="color: #FFAA00;">Hello</span> (orange)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Common Colors Reference</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Color</th>
+                            <th>Hex Code</th>
+                            <th>Preview</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Red</td>
+                            <td><code>&#FF5555</code></td>
+                            <td><span style="color: #FF5555;">■■■■■</span></td>
+                        </tr>
+                        <tr>
+                            <td>Green</td>
+                            <td><code>&#55FF55</code></td>
+                            <td><span style="color: #55FF55;">■■■■■</span></td>
+                        </tr>
+                        <tr>
+                            <td>Blue</td>
+                            <td><code>&#5555FF</code></td>
+                            <td><span style="color: #5555FF;">■■■■■</span></td>
+                        </tr>
+                        <tr>
+                            <td>Yellow</td>
+                            <td><code>&#FFFF55</code></td>
+                            <td><span style="color: #FFFF55;">■■■■■</span></td>
+                        </tr>
+                        <tr>
+                            <td>Orange</td>
+                            <td><code>&#FFAA00</code></td>
+                            <td><span style="color: #FFAA00;">■■■■■</span></td>
+                        </tr>
+                        <tr>
+                            <td>Purple</td>
+                            <td><code>&#AA00FF</code></td>
+                            <td><span style="color: #AA00FF;">■■■■■</span></td>
+                        </tr>
+                        <tr>
+                            <td>Cyan</td>
+                            <td><code>&#55FFFF</code></td>
+                            <td><span style="color: #55FFFF;">■■■■■</span></td>
+                        </tr>
+                        <tr>
+                            <td>Pink</td>
+                            <td><code>&#FF55FF</code></td>
+                            <td><span style="color: #FF55FF;">■■■■■</span></td>
+                        </tr>
+                        <tr>
+                            <td>White</td>
+                            <td><code>&#FFFFFF</code></td>
+                            <td><span style="color: #FFFFFF;">■■■■■</span></td>
+                        </tr>
+                        <tr>
+                            <td>Gray</td>
+                            <td><code>&#AAAAAA</code></td>
+                            <td><span style="color: #AAAAAA;">■■■■■</span></td>
+                        </tr>
+                        <tr>
+                            <td>Dark Gray</td>
+                            <td><code>&#555555</code></td>
+                            <td><span style="color: #555555;">■■■■■</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Combining Styles</h3>
+                <p>You can combine multiple formatting codes. Codes apply to all text that follows until reset with <code>&r</code>.</p>
+
+<pre><code>// Green bold player name, then normal white text
+"&#55FF55&b{player} &rhas joined the server"
+
+// Result: [green bold]Steve[/green bold] has joined the server</code></pre>
+
+<pre><code>// Red bold player name, gray "left", orange world name
+"&#FF5555&b{player} &r&#888888left &#FFAA00{world}"
+
+// Result: [red bold]Steve[/red bold] [gray]left[/gray] [orange]The Forgotten Temple[/orange]</code></pre>
+
+                <h3>Full Example</h3>
+<pre><code>{
+  "enabled": true,
+  "serverJoinMessage": "&#55FF55&b+ {player} &r&#AAAAAAjoined the server",
+  "serverLeaveMessage": "&#FF5555&b- {player} &r&#AAAAAAleft the server",
+  "worldEnterMessage": "&#AAAAAA{player} entered &#FFAA00&b{world}",
+  "worldLeaveMessage": "&#AAAAAA{player} left &#FFAA00&b{world}"
+}</code></pre>
+
+                <div class="callout callout-tip">
+                    <div class="callout-title">Tips</div>
+                    <p>
+                        • Use <code>&r</code> to reset formatting before starting a new style<br>
+                        • Hex colors must be exactly 6 characters (RRGGBB)<br>
+                        • Codes are case-insensitive (<code>&B</code> and <code>&b</code> both work)<br>
+                        • Use a color picker tool to find the perfect hex color for your server theme
+                    </p>
                 </div>
             </section>
 
