@@ -39,10 +39,14 @@ import com.leclowndu93150.hyssentials.manager.WarpManager;
 import com.leclowndu93150.hyssentials.manager.PrivateMessageManager;
 import com.leclowndu93150.hyssentials.manager.AdminChatManager;
 import com.leclowndu93150.hyssentials.manager.VanishManager;
+import com.leclowndu93150.hyssentials.manager.JoinMessageManager;
 import com.leclowndu93150.hyssentials.commands.admin.VanishCommand;
 import com.leclowndu93150.hyssentials.system.PlayerDeathBackSystem;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
+import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
+import com.hypixel.hytale.server.core.event.events.player.DrainPlayerFromWorldEvent;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import java.util.logging.Level;
 import javax.annotation.Nonnull;
 
@@ -59,6 +63,7 @@ public class HyssentialsPlugin extends JavaPlugin {
     private PrivateMessageManager msgManager;
     private AdminChatManager adminChatManager;
     private VanishManager vanishManager;
+    private JoinMessageManager joinMessageManager;
 
     public HyssentialsPlugin(@Nonnull JavaPluginInit init) {
         super(init);
@@ -83,12 +88,17 @@ public class HyssentialsPlugin extends JavaPlugin {
         this.msgManager = new PrivateMessageManager();
         this.adminChatManager = new AdminChatManager(this.getDataDirectory(), this.getLogger());
         this.vanishManager = new VanishManager();
+        this.joinMessageManager = new JoinMessageManager(this.getDataDirectory(), this.getLogger());
 
         this.getEntityStoreRegistry().registerSystem(new PlayerDeathBackSystem(this.backManager));
 
         // Register player connect/disconnect events for vanish
         this.getEventRegistry().register(PlayerConnectEvent.class, this::onPlayerConnect);
         this.getEventRegistry().register(PlayerDisconnectEvent.class, this::onPlayerDisconnect);
+
+        // Register world join/leave events for custom messages
+        this.getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, this.joinMessageManager::onPlayerJoinWorld);
+        this.getEventRegistry().registerGlobal(DrainPlayerFromWorldEvent.class, this.joinMessageManager::onPlayerLeaveWorld);
     }
 
     @Override
@@ -122,6 +132,22 @@ public class HyssentialsPlugin extends JavaPlugin {
 
     private void onPlayerConnect(@Nonnull PlayerConnectEvent event) {
         vanishManager.onPlayerJoin(event.getPlayerRef());
+
+        // Grant default rank to new players if they don't have any rank
+        PlayerRef player = event.getPlayerRef();
+        if (!playerHasAnyRank(player)) {
+            rankManager.grantRankPermission(player.getUuid(), rankManager.getDefaultRankId());
+        }
+    }
+
+    private boolean playerHasAnyRank(@Nonnull PlayerRef player) {
+        for (var rank : rankManager.getAllRanks()) {
+            if (com.hypixel.hytale.server.core.permissions.PermissionsModule.get()
+                    .hasPermission(player.getUuid(), rank.getPermission())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void onPlayerDisconnect(@Nonnull PlayerDisconnectEvent event) {
@@ -150,6 +176,9 @@ public class HyssentialsPlugin extends JavaPlugin {
         this.rankManager.reload();
         if (this.adminChatManager != null) {
             this.adminChatManager.reload();
+        }
+        if (this.joinMessageManager != null) {
+            this.joinMessageManager.reload();
         }
     }
 }

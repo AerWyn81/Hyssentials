@@ -401,6 +401,7 @@
                 <div class="nav-section-title">Admin Guide</div>
                 <a href="#admin-commands" class="nav-link">Admin Commands</a>
                 <a href="#admin-chat" class="nav-link">Admin Chat</a>
+                <a href="#custom-join-messages" class="nav-link">Join Messages</a>
                 <a href="#rank-system" class="nav-link">Rank System</a>
                 <a href="#rank-management" class="nav-link">Rank Management UI</a>
                 <a href="#player-assignment" class="nav-link">Assigning Ranks</a>
@@ -411,6 +412,7 @@
                 <a href="#config-files" class="nav-link">Config Files</a>
                 <a href="#ranks-json" class="nav-link">ranks.json</a>
                 <a href="#adminchat-json" class="nav-link">adminchat.json</a>
+                <a href="#joinmessages-json" class="nav-link">joinmessages.json</a>
                 <a href="#permissions" class="nav-link">Permissions</a>
             </div>
         </nav>
@@ -437,6 +439,7 @@
                     <li><strong>Admin UI</strong> - In-game graphical interface for rank management</li>
                     <li><strong>Interactive GUIs</strong> - Run commands without arguments to open selection UIs</li>
                     <li><strong>Vanish Mode</strong> - Staff can become invisible to other players with /vanish</li>
+                    <li><strong>Custom Join Messages</strong> - Customize player join and leave messages with placeholders</li>
                 </ul>
             </section>
 
@@ -901,6 +904,54 @@
                 </div>
             </section>
 
+            <!-- Custom Join Messages -->
+            <section id="custom-join-messages" class="section">
+                <h2>Custom Join/Leave Messages</h2>
+                <p>Customize the messages shown when players join or leave the world. By default, this feature is disabled and Hytale's default messages are used.</p>
+
+                <h3>Configuration</h3>
+                <p>Edit <code>joinmessages.json</code> in the plugin data folder:</p>
+
+<pre><code>{
+  "enabled": true,
+  "joinMessage": "{player} has entered {world}",
+  "leaveMessage": "{player} has left {world}"
+}</code></pre>
+
+                <h3>Placeholders</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>{player}</code></td>
+                            <td>The player's username</td>
+                        </tr>
+                        <tr>
+                            <td><code>{world}</code></td>
+                            <td>The world's display name</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Example Messages</h3>
+                <ul>
+                    <li><code>{player} has returned to {world}</code></li>
+                    <li><code>Welcome {player} to {world}!</code></li>
+                    <li><code>{player} joined the server</code></li>
+                    <li><code>Goodbye {player}!</code></li>
+                </ul>
+
+                <div class="callout callout-tip">
+                    <div class="callout-title">Tip</div>
+                    <p>Set <code>enabled</code> to <code>false</code> to use Hytale's default join messages. The custom messages only apply when enabled is true.</p>
+                </div>
+            </section>
+
             <!-- Rank System -->
             <section id="rank-system" class="section">
                 <h2>Rank System</h2>
@@ -1145,6 +1196,51 @@
                 <div class="callout callout-tip">
                     <div class="callout-title">Custom Groups</div>
                     <p>You can add as many groups as you need. For example, add a "mod" group with permission <code>hyssentials.adminchat.mod</code> for moderators.</p>
+                </div>
+            </section>
+
+            <!-- joinmessages.json -->
+            <section id="joinmessages-json" class="section">
+                <h2>joinmessages.json Structure</h2>
+                <p>Configuration for custom join and leave messages:</p>
+
+                <pre><code>{
+  "enabled": false,
+  "joinMessage": "{player} has joined {world}",
+  "leaveMessage": "{player} has left {world}"
+}</code></pre>
+
+                <h3>Properties</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Property</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>enabled</code></td>
+                            <td>boolean</td>
+                            <td>Set to <code>true</code> to use custom messages, <code>false</code> for default Hytale messages</td>
+                        </tr>
+                        <tr>
+                            <td><code>joinMessage</code></td>
+                            <td>string</td>
+                            <td>Message shown when a player joins. Use <code>{player}</code> and <code>{world}</code> placeholders</td>
+                        </tr>
+                        <tr>
+                            <td><code>leaveMessage</code></td>
+                            <td>string</td>
+                            <td>Message shown when a player leaves. Use <code>{player}</code> and <code>{world}</code> placeholders</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="callout callout-info">
+                    <div class="callout-title">Note</div>
+                    <p>This feature is disabled by default. Set <code>enabled</code> to <code>true</code> to use your custom messages instead of Hytale's built-in join/leave announcements.</p>
                 </div>
             </section>
 

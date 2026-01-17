@@ -4,103 +4,23 @@ Essential server commands and a powerful rank system for Hytale.
 
 ## Features
 
-- **Teleport Requests (TPA)** - Request to teleport to other players
-- **Homes** - Save and teleport to personal locations
-- **Warps** - Server-wide teleport points
-- **Random Teleport** - Teleport to random safe locations
-- **Spawn** - Quick teleport to server spawn
-- **Back** - Return to previous location (works after death!)
-- **Rank System** - Fully customizable ranks with in-game UI
-- **Per-Rank Settings** - Configure cooldowns, warmups, and home limits per rank
+- [**Teleport Requests (TPA)**](https://leclowndu93150.github.io/Hyssentials/#tpa-system) - Request to teleport to other players
+- [**Homes**](https://leclowndu93150.github.io/Hyssentials/#homes) - Save and teleport to personal locations
+- [**Warps**](https://leclowndu93150.github.io/Hyssentials/#warps) - Server-wide teleport points
+- [**Random Teleport**](https://leclowndu93150.github.io/Hyssentials/#random-teleport) - Teleport to random safe locations
+- [**Spawn**](https://leclowndu93150.github.io/Hyssentials/#spawn) - Quick teleport to server spawn
+- [**Back**](https://leclowndu93150.github.io/Hyssentials/#back) - Return to previous location
+- [**Private Messaging**](https://leclowndu93150.github.io/Hyssentials/#private-messaging) - Send private messages to other players
+- [**Admin Chat**](https://leclowndu93150.github.io/Hyssentials/#admin-chat) - Configurable staff/admin chat channels
+- [**Vanish**](https://leclowndu93150.github.io/Hyssentials/#vanish) - Become invisible to other players
+- [**Custom Join/Leave Messages**](https://leclowndu93150.github.io/Hyssentials/#custom-join-messages) - Customize player join and leave messages
+- [**Interactive UIs**](https://leclowndu93150.github.io/Hyssentials/#interactive-uis) - Click-to-teleport interfaces
+- [**Rank System**](https://leclowndu93150.github.io/Hyssentials/#rank-system) - Fully customizable ranks with in-game UI
+- [**Per-Rank Settings**](https://leclowndu93150.github.io/Hyssentials/#per-rank-settings) - Configure cooldowns, warmups, and home limits per rank
 
 ## Documentation
 
-**[View Full Documentation](docs/index.html)** - Comprehensive guide for players and admins
-
-## Quick Start
-
-### Player Commands
-
-| Command | Description |
-|---------|-------------|
-| `/tpa <player>` | Request to teleport to a player |
-| `/tpahere <player>` | Request a player to teleport to you |
-| `/tpaccept` / `/tpdeny` | Accept or deny teleport requests |
-| `/sethome <name>` | Save your current location |
-| `/home <name>` | Teleport to a saved home |
-| `/homes` | List all your homes |
-| `/warp <name>` | Teleport to a server warp |
-| `/warps` | List all warps |
-| `/spawn` | Teleport to spawn |
-| `/rtp` | Random teleport (aliases: `/randomtp`, `/wild`) |
-| `/back` | Return to previous location |
-
-### Admin Commands
-
-| Command | Description |
-|---------|-------------|
-| `/hyssentials rank` | Open rank management UI |
-| `/hyssentials assign` | Open player rank assignment UI |
-| `/hyssentials setrank <player> <rank>` | Give a rank to a player |
-| `/hyssentials removerank <player> <rank>` | Remove a rank from a player |
-| `/hyssentials playerinfo <player>` | View player's rank info |
-| `/hyssentials reload` | Reload configuration |
-| `/setwarp <name>` | Create a server warp |
-| `/delwarp <name>` | Delete a warp |
-| `/setspawn` | Set server spawn |
-| `/htp <player>` | Teleport to a player |
-| `/htphere <player>` | Teleport a player to you |
-
-*Tip: Use `/hys` as a shortcut for `/hyssentials`*
-
-## Rank System
-
-Hyssentials features a fully customizable rank-based configuration system with an in-game UI.
-
-![Rank Management](docs/images/rank-management.png)
-
-### Per-Rank Configuration
-- **Max Homes** - How many homes each rank can set
-- **Cooldowns** - Time between command uses (per command)
-- **Warmups** - Delay before teleport (moving cancels it)
-- **Command Access** - Enable/disable commands per rank
-- **Granted Permissions** - Additional permissions from other plugins
-
-### Default Ranks
-
-| Rank | Permission | Max Homes | Cooldowns |
-|------|------------|-----------|-----------|
-| Default | `hyssentials.rank.default` | 5 | 60 seconds |
-| VIP | `hyssentials.rank.vip` | 10 | None |
-
-## Configuration Files
-
-| File | Description |
-|------|-------------|
-| `config.json` | Global settings |
-| `ranks.json` | Rank definitions |
-| `homes.json` | Player home locations |
-| `warps.json` | Server warp points |
-| `spawn.json` | Custom spawn point |
-
-## Permissions
-
-### Admin Permissions
-- `hyssentials.admin.ranks` - Access rank management UI
-- `hyssentials.admin.setrank` - Assign/remove ranks
-- `hyssentials.admin.playerinfo` - View player info
-- `hyssentials.admin.reload` - Reload configuration
-- `hyssentials.setspawn` - Set server spawn
-- `hyssentials.setwarp` / `hyssentials.delwarp` - Manage warps
-- `hyssentials.htp` / `hyssentials.htphere` - Admin teleport
-
-### Special Permissions
-- `hyssentials.cooldown.bypass` - Bypass all cooldowns and warmups
-
-### Legacy Permissions (Backwards Compatible)
-- `hyssentials.vip` - Maps to VIP rank
-- `hyssentials.vip.homes` - Extended home limit
-- `hyssentials.vip.cooldown` - Reduced cooldowns
+**[View Full Documentation](https://leclowndu93150.github.io/Hyssentials/)** - Comprehensive guide covering all commands, permissions, and configuration options
 
 ## Support
 

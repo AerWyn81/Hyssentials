@@ -4,8 +4,8 @@ plugins {
 }
 
 group = "com.leclowndu93150"
-version = "2.2.0"
-val javaVersion = 25
+version = "2.3.0"
+val javaVersion = 21
 
 repositories {
     mavenCentral()
