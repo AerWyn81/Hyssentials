@@ -151,7 +151,7 @@ public enum Messages {
     UI_LABEL_WARMUP("ui.label.warmup"),
     UI_LABEL_TIMEOUT("ui.label.timeout"),
     UI_SECTION_PERMISSIONS("ui.section.permissions"),
-    UI_LABEL_PERMISSIONS_DESC("ui.label.permissions_desc"),
+    UI_SECTION_PERMISSIONS_DESC("ui.section.permissions_desc"),
 
     // TPA List
     UI_TPA_LIST_TITLE("ui.tpa_list.title"),

@@ -242,10 +242,7 @@ public final class LanguageManager {
     private static Map<String, Object> unflatten(@Nonnull Map<String, String> flat) {
         Map<String, Object> result = new LinkedHashMap<>();
 
-        List<String> sortedKeys = new ArrayList<>(flat.keySet());
-        Collections.sort(sortedKeys);
-
-        for (String flatKey : sortedKeys) {
+        for (String flatKey : flat.keySet()) {
             String[] parts = flatKey.split("\\.");
             Map<String, Object> current = result;
 
